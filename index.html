@@ -4,49 +4,72 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Para Você</title>
-
   <style>
     body {
       margin: 0;
-      background: black;
+      background: #000;
       height: 100vh;
       overflow: hidden;
       font-family: Arial, sans-serif;
     }
-
+    #start {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      text-align: center;
+      cursor: pointer;
+      padding: 24px;
+    }
+    #start div {
+      max-width: 520px;
+      line-height: 1.4;
+      font-size: 18px;
+      opacity: 0.95;
+    }
     video {
       width: 100vw;
       height: 100vh;
       object-fit: contain;
-      background: black;
-    }
-
-    .hint {
-      position: fixed;
-      bottom: 20px;
-      width: 100%;
-      text-align: center;
-      color: rgba(255,255,255,0.8);
-      font-size: 14px;
+      background: #000;
+      display: none;
     }
   </style>
 </head>
 <body>
 
-  <video id="v" autoplay muted playsinline controls>
+  <div id="start">
+    <div>
+      Coloque o som. Respire fundo.<br><br>
+      <strong>Toque aqui para começar ▶</strong>
+    </div>
+  </div>
+
+  <video id="v" playsinline controls>
     <source src="./video.mp4" type="video/mp4" />
     Seu navegador não suporta vídeo.
   </video>
 
-  <div class="hint">Toque na tela para ativar o som 🔊</div>
-
   <script>
+    const start = document.getElementById("start");
     const v = document.getElementById("v");
 
-    // quando tocar no vídeo, ativa o som
-    v.addEventListener("click", () => {
-      v.muted = false;
-      v.volume = 1;
+    start.addEventListener("click", async () => {
+      start.style.display = "none";
+      v.style.display = "block";
+      try {
+        await v.play();
+      } catch (e) {
+        // Se o autoplay falhar, o play manual pelo controle resolve.
+      }
+
+      // tenta ir para tela cheia (pode depender do navegador)
+      const requestFS = v.requestFullscreen || v.webkitRequestFullscreen || v.msRequestFullscreen;
+      if (requestFS) {
+        try { requestFS.call(v); } catch (e) {}
+      }
     });
   </script>
 
