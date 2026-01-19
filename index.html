@@ -71,6 +71,8 @@
     .butterfly{
       font-size:28px;
       animation: flutter 1.6s ease-in-out infinite;
+      display:inline-block;
+      transform-origin:center;
     }
     .butterfly:nth-child(2){ animation-delay:.2s; }
     .butterfly:nth-child(3){ animation-delay:.4s; }
@@ -80,28 +82,34 @@
       50%{ transform: translateY(-6px) rotate(6deg); }
     }
 
-    /* 🦋 VOANDO PARA FORA */
-    .butterflies.fly-away .butterfly{
-      animation: flyAway 1.2s ease-in forwards;
+    /* ✨ Virar luz e sumir */
+    .butterflies.light-away .butterfly{
+      animation: lightAway 0.95s ease-out forwards;
+      filter: drop-shadow(0 0 0 rgba(255,255,255,0));
     }
-    .butterflies.fly-away .butterfly:nth-child(1){
-      --dx:-140px; --dy:-160px;
-    }
-    .butterflies.fly-away .butterfly:nth-child(2){
-      --dx:0px; --dy:-200px;
-    }
-    .butterflies.fly-away .butterfly:nth-child(3){
-      --dx:140px; --dy:-160px;
-    }
+    .butterflies.light-away .butterfly:nth-child(1){ --dx:-10px; --dy:-10px; }
+    .butterflies.light-away .butterfly:nth-child(2){ --dx:  0px; --dy:-14px; }
+    .butterflies.light-away .butterfly:nth-child(3){ --dx: 10px; --dy:-10px; }
 
-    @keyframes flyAway{
-      from{
+    @keyframes lightAway{
+      0%{
         opacity:1;
         transform: translate(0,0) scale(1);
+        filter: drop-shadow(0 0 0 rgba(255,255,255,0));
       }
-      to{
+      45%{
+        opacity:1;
+        transform: translate(var(--dx), var(--dy)) scale(1.15);
+        filter:
+          drop-shadow(0 0 10px rgba(255,255,255,.55))
+          drop-shadow(0 0 22px rgba(255,77,141,.45));
+      }
+      100%{
         opacity:0;
-        transform: translate(var(--dx), var(--dy)) scale(0.6);
+        transform: translate(calc(var(--dx) * 2), calc(var(--dy) * 2)) scale(1.6);
+        filter:
+          drop-shadow(0 0 28px rgba(255,255,255,.10))
+          drop-shadow(0 0 40px rgba(255,77,141,.10));
       }
     }
 
@@ -303,6 +311,7 @@
 
     video.style.display="block";
     requestAnimationFrame(()=>video.classList.add("show"));
+
     try{ await video.play(); }catch(e){}
 
     if(video.requestFullscreen){
@@ -321,9 +330,13 @@
       return;
     }
     if(stage===1){
-      butterflies.classList.add("fly-away");
+      // ✨ 2º toque: borboletas viram luz e somem
+      butterflies.classList.add("light-away");
+
       stage = 2;
-      setTimeout(startVideo, 500);
+
+      // espera o brilho acontecer e então inicia o vídeo
+      setTimeout(startVideo, 550);
     }
   }
 
