@@ -58,6 +58,7 @@
       position:relative;
       overflow:hidden;
     }
+
     .title{
       font-size:22px;
       margin:0 0 8px;
@@ -69,7 +70,7 @@
       font-size:15px;
     }
 
-    /* ✅ DATA ANIMADA */
+    /* DATA ANIMADA (começa escondida) */
     .date{
       display:inline-block;
       margin-top:10px;
@@ -87,7 +88,6 @@
       position:relative;
       overflow:hidden;
     }
-    /* brilho passando */
     .date::after{
       content:"";
       position:absolute;
@@ -105,7 +105,7 @@
       filter: blur(0);
     }
     .date.show::after{
-      animation: shine 1.2s ease .35s 1;
+      animation: shine 1.2s ease .25s 1;
       opacity:1;
     }
     @keyframes shine{
@@ -161,7 +161,6 @@
       <p class="title">Para você, Thamires 💖</p>
       <p class="subtitle">Um pequeno resumo do início de tudo.</p>
 
-      <!-- ✅ A DATA (vai aparecer suavemente) -->
       <div id="date" class="date">12/12/2025</div>
 
       <div class="btn">
@@ -184,50 +183,98 @@
     Seu navegador não suporta vídeo.
   </video>
 
- <script>
-  const start = document.getElementById("start");
-  const v = document.getElementById("v");
-  const dateEl = document.getElementById("date");
+  <script>
+    const start = document.getElementById("start");
+    const v = document.getElementById("v");
+    const dateEl = document.getElementById("date");
+    const btnText = start.querySelector(".btn span:first-child");
 
-  let stage = 0; // 0 = nada, 1 = data mostrada, 2 = video iniciado
+    let stage = 0; // 0 = inicio, 1 = data mostrada, 2 = video
+    let audioCtx = null;
 
-  async function startVideo(){
-    start.classList.add("hide");
-    setTimeout(() => { start.style.display = "none"; }, 600);
-
-    v.style.display = "block";
-    requestAnimationFrame(() => v.classList.add("show"));
-
-    try { await v.play(); } catch (e) {}
-
-    const requestFS = v.requestFullscreen || v.webkitRequestFullscreen || v.msRequestFullscreen;
-    if (requestFS) { try { requestFS.call(v); } catch (e) {} }
-  }
-
-  function handleStart(){
-    if (stage === 0) {
-      // 1º toque: revela a data
-      dateEl.classList.add("show");
-      stage = 1;
-      return;
+    // Som suave gerado pelo navegador (não precisa de arquivo)
+    function initAudio(){
+      if (!audioCtx) {
+        const AC = window.AudioContext || window.webkitAudioContext;
+        audioCtx = new AC();
+      }
+      // Em alguns celulares, pode vir "suspended" até o toque; tenta liberar:
+      if (audioCtx.state === "suspended") audioCtx.resume().catch(()=>{});
     }
-    if (stage === 1) {
-      // 2º toque: inicia o vídeo
-      stage = 2;
-      startVideo();
-    }
-  }
 
-  start.addEventListener("click", handleStart);
+    function playSoftChime(){
+      try{
+        initAudio();
 
-  start.addEventListener("keydown", (e) => {
-    if (e.key === "Enter" || e.key === " ") {
-      e.preventDefault();
-      handleStart();
+        const now = audioCtx.currentTime;
+
+        // Oscilador bem suave
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+
+        // tipo e frequência (leve, "fofinho", nada de alarme)
+        osc.type = "sine";
+        osc.frequency.setValueAtTime(659.25, now); // E5
+        osc.frequency.exponentialRampToValueAtTime(523.25, now + 0.12); // C5
+
+        // volume baixinho com envelope
+        gain.gain.setValueAtTime(0.0001, now);
+        gain.gain.exponentialRampToValueAtTime(0.08, now + 0.02);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.18);
+
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+
+        osc.start(now);
+        osc.stop(now + 0.20);
+      }catch(e){
+        // Se algo bloquear áudio, segue sem som.
+      }
     }
-  });
-</script>
+
+    async function startVideo(){
+      start.classList.add("hide");
+      setTimeout(() => { start.style.display = "none"; }, 600);
+
+      v.style.display = "block";
+      requestAnimationFrame(() => v.classList.add("show"));
+
+      try { await v.play(); } catch (e) {}
+
+      const requestFS =
+        v.requestFullscreen ||
+        v.webkitRequestFullscreen ||
+        v.msRequestFullscreen;
+
+      if (requestFS) { try { requestFS.call(v); } catch (e) {} }
+    }
+
+    function handleStart(){
+      if (stage === 0) {
+        // 1º toque: mostra data + som leve + troca texto do botão
+        playSoftChime();
+        dateEl.classList.add("show");
+        btnText.textContent = "Agora… vamos lembrar ▶";
+        stage = 1;
+        return;
+      }
+
+      if (stage === 1) {
+        // 2º toque: inicia o vídeo
+        stage = 2;
+        startVideo();
+      }
+    }
+
+    start.addEventListener("click", handleStart);
+
+    start.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        handleStart();
+      }
+    });
+  </script>
 
 </body>
 </html>
-
