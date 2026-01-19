@@ -184,38 +184,50 @@
     Seu navegador não suporta vídeo.
   </video>
 
-  <script>
-    const start = document.getElementById("start");
-    const v = document.getElementById("v");
-    const dateEl = document.getElementById("date");
+ <script>
+  const start = document.getElementById("start");
+  const v = document.getElementById("v");
+  const dateEl = document.getElementById("date");
 
-    // ✅ faz a data aparecer sozinha após um pequeno delay
-    window.addEventListener("load", () => {
-      setTimeout(() => dateEl.classList.add("show"), 450);
-    });
+  let stage = 0; // 0 = nada, 1 = data mostrada, 2 = video iniciado
 
-    async function startVideo(){
-      start.classList.add("hide");
-      setTimeout(() => { start.style.display = "none"; }, 600);
+  async function startVideo(){
+    start.classList.add("hide");
+    setTimeout(() => { start.style.display = "none"; }, 600);
 
-      v.style.display = "block";
-      requestAnimationFrame(() => v.classList.add("show"));
+    v.style.display = "block";
+    requestAnimationFrame(() => v.classList.add("show"));
 
-      try { await v.play(); } catch (e) {}
+    try { await v.play(); } catch (e) {}
 
-      const requestFS = v.requestFullscreen || v.webkitRequestFullscreen || v.msRequestFullscreen;
-      if (requestFS) { try { requestFS.call(v); } catch (e) {} }
+    const requestFS = v.requestFullscreen || v.webkitRequestFullscreen || v.msRequestFullscreen;
+    if (requestFS) { try { requestFS.call(v); } catch (e) {} }
+  }
+
+  function handleStart(){
+    if (stage === 0) {
+      // 1º toque: revela a data
+      dateEl.classList.add("show");
+      stage = 1;
+      return;
     }
+    if (stage === 1) {
+      // 2º toque: inicia o vídeo
+      stage = 2;
+      startVideo();
+    }
+  }
 
-    start.addEventListener("click", startVideo);
+  start.addEventListener("click", handleStart);
 
-    start.addEventListener("keydown", (e) => {
-      if (e.key === "Enter" || e.key === " ") {
-        e.preventDefault();
-        startVideo();
-      }
-    });
-  </script>
+  start.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      handleStart();
+    }
+  });
+</script>
 
 </body>
 </html>
+
