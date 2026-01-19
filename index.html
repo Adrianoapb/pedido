@@ -21,7 +21,7 @@
       color: var(--txt);
     }
 
-    /* ❤️ CORAÇÕES (aparecem só no início) */
+    /* ❤️ CORAÇÕES (pouco tempo) */
     .heart{
       position:fixed;
       bottom:-20px;
@@ -49,6 +49,35 @@
       from{ transform: translateY(0) rotate(45deg); opacity:0; }
       10%{ opacity:.8; }
       to{ transform: translateY(-120vh) rotate(45deg); opacity:0; }
+    }
+
+    /* 🦋 BORBOLETAS */
+    .butterflies{
+      display:flex;
+      justify-content:center;
+      gap:14px;
+      margin:10px 0;
+      opacity:0;
+      transform: translateY(8px);
+      filter: blur(1px);
+      transition: all .9s ease;
+    }
+    .butterflies.show{
+      opacity:1;
+      transform: translateY(0);
+      filter:none;
+    }
+
+    .butterfly{
+      font-size:26px;
+      animation: flutter 1.6s ease-in-out infinite;
+    }
+    .butterfly:nth-child(2){ animation-delay:.2s; }
+    .butterfly:nth-child(3){ animation-delay:.4s; }
+
+    @keyframes flutter{
+      0%,100%{ transform: translateY(0) rotate(0deg); }
+      50%{ transform: translateY(-6px) rotate(6deg); }
     }
 
     /* ABERTURA */
@@ -86,27 +115,7 @@
     }
 
     .title{ font-size:22px; margin:0 0 8px; }
-    .subtitle{ font-size:15px; color: var(--muted); margin:0 0 10px; }
-
-    .date{
-      display:inline-block;
-      margin:8px 0 10px;
-      padding:8px 14px;
-      border-radius:999px;
-      background: rgba(255,77,141,.14);
-      border:1px solid rgba(255,77,141,.4);
-      font-weight:800;
-      letter-spacing:.6px;
-      opacity:0;
-      transform: translateY(8px);
-      filter: blur(1px);
-      transition: all .9s ease;
-    }
-    .date.show{
-      opacity:1;
-      transform: translateY(0);
-      filter:none;
-    }
+    .subtitle{ font-size:15px; color: var(--muted); margin:0 0 6px; }
 
     .btn{
       margin-top:14px;
@@ -166,14 +175,8 @@
       border-radius:999px;
       background: rgba(255,255,255,.10);
       border: 1px solid rgba(255,255,255,.22);
-      color: var(--txt);
       font-weight:700;
       cursor:pointer;
-      user-select:none;
-    }
-
-    @media (max-width:420px){
-      .title{ font-size:20px; }
     }
   </style>
 </head>
@@ -186,7 +189,12 @@
     <p class="title">Para você, Thamires 💖</p>
     <p class="subtitle">Um pequeno resumo do início de tudo.</p>
 
-    <div id="date" class=>🦋🦋🦋🦋🦋</div>
+    <!-- 🦋 BORBOLETAS -->
+    <div id="butterflies" class="butterflies">
+      <span class="butterfly">🦋</span>
+      <span class="butterfly">🦋</span>
+      <span class="butterfly">🦋</span>
+    </div>
 
     <div class="btn">
       <span id="btnText">Toque aqui para começar ▶</span>
@@ -196,7 +204,7 @@
   </div>
 </div>
 
-<!-- VÍDEO (sem controles) -->
+<!-- VÍDEO -->
 <video id="video" playsinline preload="auto">
   <source src="./video.mp4" type="video/mp4">
 </video>
@@ -204,13 +212,12 @@
 <!-- FINAL -->
 <div id="end">
   <div class="card">
-    <p class="title">Desde 12/12/2025</p>
+    <p class="title">Desde aquele começo</p>
     <p style="color:rgba(255,255,255,.85);margin:0">
       eu tenho certeza de uma coisa:<br><br>
       é com você que eu quero continuar.<br><br>
       Eu te amo, Thamires. 💛
     </p>
-
     <div id="exit" class="exitBtn">Toque para sair ✨</div>
   </div>
 </div>
@@ -218,7 +225,7 @@
 <script>
   const start = document.getElementById("start");
   const video = document.getElementById("video");
-  const dateEl = document.getElementById("date");
+  const butterflies = document.getElementById("butterflies");
   const btnText = document.getElementById("btnText");
   const end = document.getElementById("end");
   const exitBtn = document.getElementById("exit");
@@ -226,40 +233,21 @@
   let stage = 0;
   let audioCtx = null;
 
-  /* ❤️ CORAÇÕES: sobem por pouco tempo */
+  /* ❤️ CORAÇÕES (tempo curto) */
   let heartsInterval = null;
-  const HEARTS_DURATION_MS = 6000; // <- tempo que os corações ficam (6s)
-
   function createHeart(){
-    const heart = document.createElement("div");
-    heart.className = "heart";
-    heart.style.left = Math.random() * 100 + "vw";
-    heart.style.animationDuration = (6 + Math.random() * 4) + "s";
-    heart.style.transform = "rotate(45deg) scale(" + (0.55 + Math.random() * 0.9) + ")";
-    document.body.appendChild(heart);
-    setTimeout(() => heart.remove(), 11000);
+    const h = document.createElement("div");
+    h.className = "heart";
+    h.style.left = Math.random()*100 + "vw";
+    h.style.animationDuration = (6 + Math.random()*4) + "s";
+    document.body.appendChild(h);
+    setTimeout(()=>h.remove(),10000);
   }
-
-  function startHearts(){
-    if (heartsInterval) return;
-    heartsInterval = setInterval(createHeart, 320);
-
-    // para criar um "burst" inicial
-    for (let i = 0; i < 10; i++) setTimeout(createHeart, i * 120);
-
-    setTimeout(stopHearts, HEARTS_DURATION_MS);
-  }
-
-  function stopHearts(){
-    if (!heartsInterval) return;
+  heartsInterval = setInterval(createHeart,300);
+  setTimeout(()=>{
     clearInterval(heartsInterval);
-    heartsInterval = null;
-
-    // remove rapidamente o que ainda estiver na tela
-    document.querySelectorAll(".heart").forEach(h => h.remove());
-  }
-
-  startHearts(); // inicia ao abrir a página
+    document.querySelectorAll(".heart").forEach(h=>h.remove());
+  },5000);
 
   function playSoftSound(){
     try{
@@ -280,73 +268,54 @@
 
       osc.connect(gain);
       gain.connect(audioCtx.destination);
-
       osc.start(t);
       osc.stop(t + 0.2);
     }catch(e){}
   }
 
   async function startVideo(){
-    // garante que corações parem ao iniciar o vídeo
-    stopHearts();
-
     start.classList.add("hide");
-    setTimeout(()=> start.style.display="none",600);
+    setTimeout(()=>start.style.display="none",600);
 
     video.style.display="block";
-    requestAnimationFrame(()=> video.classList.add("show"));
-
+    requestAnimationFrame(()=>video.classList.add("show"));
     try{ await video.play(); }catch(e){}
 
-    // 🎬 Tela cheia
     if (video.requestFullscreen) {
       video.requestFullscreen().catch(()=>{});
     } else if (video.webkitEnterFullscreen) {
-      video.webkitEnterFullscreen(); // iOS Safari
-    } else if (video.webkitRequestFullscreen) {
-      video.webkitRequestFullscreen();
+      video.webkitEnterFullscreen();
     }
   }
 
   function handleStart(){
-    if(stage === 0){
+    if(stage===0){
       playSoftSound();
-      dateEl.classList.add("show");
+      butterflies.classList.add("show");
       btnText.textContent = "Agora… vamos lembrar ▶";
-      stage = 1;
+      stage=1;
       return;
     }
-    if(stage === 1){
-      stage = 2;
+    if(stage===1){
+      stage=2;
       startVideo();
     }
   }
 
   start.addEventListener("click", handleStart);
 
-  // fim do vídeo => some o player e aparece a frase final
   video.addEventListener("ended", ()=>{
-    video.classList.remove("show");
-
-    // sai do fullscreen se possível
-    if (document.fullscreenElement) {
+    if(document.fullscreenElement){
       document.exitFullscreen().catch(()=>{});
     }
-
-    setTimeout(()=>{
-      video.style.display="none";
-      end.classList.add("show");
-    }, 500);
+    video.style.display="none";
+    end.classList.add("show");
   });
 
-  // "Toque para sair" => reinicia a homenagem (ou você pode trocar para fechar aba)
   exitBtn.addEventListener("click", ()=>{
-    // opção segura: recarrega a página e volta pro início
     window.location.reload();
   });
 </script>
 
 </body>
 </html>
-
-
