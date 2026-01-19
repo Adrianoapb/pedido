@@ -21,6 +21,41 @@
       color: var(--txt);
     }
 
+    /* ================== CORAÇÕES ================== */
+    .heart{
+      position:fixed;
+      bottom:-20px;
+      width:12px;
+      height:12px;
+      background: rgba(255,77,141,.35);
+      transform: rotate(45deg);
+      animation: floatUp linear infinite;
+      z-index:1;
+    }
+    .heart::before,
+    .heart::after{
+      content:"";
+      position:absolute;
+      width:12px;
+      height:12px;
+      background: rgba(255,77,141,.35);
+      border-radius:50%;
+    }
+    .heart::before{ left:-6px; top:0; }
+    .heart::after{ left:0; top:-6px; }
+
+    @keyframes floatUp{
+      from{
+        transform: translateY(0) rotate(45deg);
+        opacity:0;
+      }
+      10%{ opacity:.8; }
+      to{
+        transform: translateY(-120vh) rotate(45deg);
+        opacity:0;
+      }
+    }
+
     /* ================== ABERTURA ================== */
     #start{
       position:fixed;
@@ -33,7 +68,6 @@
       cursor:pointer;
       background:
         radial-gradient(800px 500px at 50% 45%, rgba(255,77,141,.18), transparent 60%),
-        radial-gradient(900px 600px at 50% 60%, rgba(255,255,255,.08), transparent 65%),
         #000;
       transition: opacity .6s ease, transform .6s ease;
       z-index:10;
@@ -48,10 +82,12 @@
       max-width:560px;
       padding:22px 18px;
       border-radius:18px;
-      background: rgba(255,255,255,.06);
-      border: 1px solid rgba(255,255,255,.12);
-      backdrop-filter: blur(8px);
-      box-shadow: 0 14px 40px rgba(0,0,0,.45);
+      background: rgba(0,0,0,.55);
+      border:1px solid rgba(255,255,255,.12);
+      backdrop-filter: blur(6px);
+      box-shadow: 0 14px 40px rgba(0,0,0,.6);
+      z-index:20;
+      position:relative;
     }
 
     .title{
@@ -78,8 +114,6 @@
       transform: translateY(8px);
       filter: blur(1px);
       transition: all .9s ease;
-      position:relative;
-      overflow:hidden;
     }
     .date.show{
       opacity:1;
@@ -112,10 +146,11 @@
       display:none;
       opacity:0;
       transition: opacity .5s ease;
+      z-index:5;
     }
     video.show{ opacity:1; }
 
-    /* ================== FRASE FINAL ================== */
+    /* ================== FINAL ================== */
     #end{
       position:fixed;
       inset:0;
@@ -130,25 +165,15 @@
       opacity:0;
       pointer-events:none;
       transition: opacity 1s ease;
-      z-index:20;
+      z-index:30;
     }
     #end.show{
       opacity:1;
       pointer-events:auto;
     }
 
-    #end .card{
-      animation: fadeUp 1.2s ease forwards;
-    }
-
-    @keyframes fadeUp{
-      from{ opacity:0; transform: translateY(10px); }
-      to{ opacity:1; transform:none; }
-    }
-
-    @media (max-width: 420px){
+    @media (max-width:420px){
       .title{ font-size:20px; }
-      .card{ font-size:16px; }
     }
   </style>
 </head>
@@ -172,11 +197,11 @@
 </div>
 
 <!-- VÍDEO -->
-<video id="v" playsinline controls preload="metadata">
+<video id="video" playsinline controls preload="metadata">
   <source src="./video.mp4" type="video/mp4">
 </video>
 
-<!-- FRASE FINAL -->
+<!-- FINAL -->
 <div id="end">
   <div class="card">
     <p class="title">Desde 12/12/2025</p>
@@ -190,13 +215,25 @@
 
 <script>
   const start = document.getElementById("start");
-  const video = document.getElementById("v");
+  const video = document.getElementById("video");
   const dateEl = document.getElementById("date");
   const btnText = document.getElementById("btnText");
   const end = document.getElementById("end");
 
   let stage = 0;
   let audioCtx = null;
+
+  /* ❤️ GERAR CORAÇÕES */
+  function createHeart(){
+    const heart = document.createElement("div");
+    heart.className = "heart";
+    heart.style.left = Math.random() * 100 + "vw";
+    heart.style.animationDuration = (8 + Math.random() * 6) + "s";
+    heart.style.transform = "rotate(45deg) scale(" + (0.6 + Math.random()) + ")";
+    document.body.appendChild(heart);
+    setTimeout(() => heart.remove(), 14000);
+  }
+  setInterval(createHeart, 450);
 
   function playSoftSound(){
     try{
@@ -249,7 +286,6 @@
 
   start.addEventListener("click", handleStart);
 
-  /* 🎬 QUANDO O VÍDEO TERMINA */
   video.addEventListener("ended", ()=>{
     video.classList.remove("show");
     setTimeout(()=>{
