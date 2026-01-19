@@ -21,7 +21,7 @@
       color: var(--txt);
     }
 
-    /* ❤️ CORAÇÕES (pouco tempo) */
+    /* ❤️ CORAÇÕES (tempo curto) */
     .heart{
       position:fixed;
       bottom:-20px;
@@ -55,12 +55,12 @@
     .butterflies{
       display:flex;
       justify-content:center;
-      gap:14px;
+      gap:16px;
       margin:10px 0;
       opacity:0;
       transform: translateY(8px);
       filter: blur(1px);
-      transition: all .9s ease;
+      transition: opacity .9s ease, transform .9s ease, filter .9s ease;
     }
     .butterflies.show{
       opacity:1;
@@ -69,7 +69,7 @@
     }
 
     .butterfly{
-      font-size:26px;
+      font-size:28px;
       animation: flutter 1.6s ease-in-out infinite;
     }
     .butterfly:nth-child(2){ animation-delay:.2s; }
@@ -78,6 +78,31 @@
     @keyframes flutter{
       0%,100%{ transform: translateY(0) rotate(0deg); }
       50%{ transform: translateY(-6px) rotate(6deg); }
+    }
+
+    /* 🦋 VOANDO PARA FORA */
+    .butterflies.fly-away .butterfly{
+      animation: flyAway 1.2s ease-in forwards;
+    }
+    .butterflies.fly-away .butterfly:nth-child(1){
+      --dx:-140px; --dy:-160px;
+    }
+    .butterflies.fly-away .butterfly:nth-child(2){
+      --dx:0px; --dy:-200px;
+    }
+    .butterflies.fly-away .butterfly:nth-child(3){
+      --dx:140px; --dy:-160px;
+    }
+
+    @keyframes flyAway{
+      from{
+        opacity:1;
+        transform: translate(0,0) scale(1);
+      }
+      to{
+        opacity:0;
+        transform: translate(var(--dx), var(--dy)) scale(0.6);
+      }
     }
 
     /* ABERTURA */
@@ -111,7 +136,6 @@
       backdrop-filter: blur(6px);
       box-shadow: 0 14px 40px rgba(0,0,0,.6);
       z-index:20;
-      position:relative;
     }
 
     .title{ font-size:22px; margin:0 0 8px; }
@@ -170,13 +194,13 @@
 
     .exitBtn{
       margin-top:18px;
-      display:inline-block;
       padding:12px 18px;
       border-radius:999px;
       background: rgba(255,255,255,.10);
-      border: 1px solid rgba(255,255,255,.22);
+      border:1px solid rgba(255,255,255,.22);
       font-weight:700;
       cursor:pointer;
+      display:inline-block;
     }
   </style>
 </head>
@@ -233,8 +257,13 @@
   let stage = 0;
   let audioCtx = null;
 
-  /* ❤️ CORAÇÕES (tempo curto) */
-  let heartsInterval = null;
+  /* ❤️ CORAÇÕES – poucos segundos */
+  let hearts = setInterval(createHeart, 320);
+  setTimeout(() => {
+    clearInterval(hearts);
+    document.querySelectorAll(".heart").forEach(h => h.remove());
+  }, 5000);
+
   function createHeart(){
     const h = document.createElement("div");
     h.className = "heart";
@@ -243,11 +272,6 @@
     document.body.appendChild(h);
     setTimeout(()=>h.remove(),10000);
   }
-  heartsInterval = setInterval(createHeart,300);
-  setTimeout(()=>{
-    clearInterval(heartsInterval);
-    document.querySelectorAll(".heart").forEach(h=>h.remove());
-  },5000);
 
   function playSoftSound(){
     try{
@@ -281,9 +305,9 @@
     requestAnimationFrame(()=>video.classList.add("show"));
     try{ await video.play(); }catch(e){}
 
-    if (video.requestFullscreen) {
+    if(video.requestFullscreen){
       video.requestFullscreen().catch(()=>{});
-    } else if (video.webkitEnterFullscreen) {
+    }else if(video.webkitEnterFullscreen){
       video.webkitEnterFullscreen();
     }
   }
@@ -293,12 +317,13 @@
       playSoftSound();
       butterflies.classList.add("show");
       btnText.textContent = "Agora… vamos lembrar ▶";
-      stage=1;
+      stage = 1;
       return;
     }
     if(stage===1){
-      stage=2;
-      startVideo();
+      butterflies.classList.add("fly-away");
+      stage = 2;
+      setTimeout(startVideo, 500);
     }
   }
 
