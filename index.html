@@ -21,7 +21,7 @@
       color: var(--txt);
     }
 
-    /* ❤️ CORAÇÕES */
+    /* ❤️ CORAÇÕES (aparecem só no início) */
     .heart{
       position:fixed;
       bottom:-20px;
@@ -31,6 +31,7 @@
       transform: rotate(45deg);
       animation: floatUp linear infinite;
       z-index:1;
+      pointer-events:none;
     }
     .heart::before,
     .heart::after{
@@ -81,6 +82,7 @@
       backdrop-filter: blur(6px);
       box-shadow: 0 14px 40px rgba(0,0,0,.6);
       z-index:20;
+      position:relative;
     }
 
     .title{ font-size:22px; margin:0 0 8px; }
@@ -157,6 +159,19 @@
       pointer-events:auto;
     }
 
+    .exitBtn{
+      margin-top:18px;
+      display:inline-block;
+      padding:12px 18px;
+      border-radius:999px;
+      background: rgba(255,255,255,.10);
+      border: 1px solid rgba(255,255,255,.22);
+      color: var(--txt);
+      font-weight:700;
+      cursor:pointer;
+      user-select:none;
+    }
+
     @media (max-width:420px){
       .title{ font-size:20px; }
     }
@@ -181,8 +196,8 @@
   </div>
 </div>
 
-<!-- VÍDEO -->
-<video id="video" playsinline controls preload="auto">
+<!-- VÍDEO (sem controles) -->
+<video id="video" playsinline preload="auto">
   <source src="./video.mp4" type="video/mp4">
 </video>
 
@@ -195,6 +210,8 @@
       é com você que eu quero continuar.<br><br>
       Eu te amo, Thamires. 💛
     </p>
+
+    <div id="exit" class="exitBtn">Toque para sair ✨</div>
   </div>
 </div>
 
@@ -204,21 +221,45 @@
   const dateEl = document.getElementById("date");
   const btnText = document.getElementById("btnText");
   const end = document.getElementById("end");
+  const exitBtn = document.getElementById("exit");
 
   let stage = 0;
   let audioCtx = null;
 
-  /* ❤️ CORAÇÕES */
+  /* ❤️ CORAÇÕES: sobem por pouco tempo */
+  let heartsInterval = null;
+  const HEARTS_DURATION_MS = 6000; // <- tempo que os corações ficam (6s)
+
   function createHeart(){
     const heart = document.createElement("div");
     heart.className = "heart";
     heart.style.left = Math.random() * 100 + "vw";
-    heart.style.animationDuration = (8 + Math.random() * 6) + "s";
-    heart.style.transform = "rotate(45deg) scale(" + (0.6 + Math.random()) + ")";
+    heart.style.animationDuration = (6 + Math.random() * 4) + "s";
+    heart.style.transform = "rotate(45deg) scale(" + (0.55 + Math.random() * 0.9) + ")";
     document.body.appendChild(heart);
-    setTimeout(() => heart.remove(), 14000);
+    setTimeout(() => heart.remove(), 11000);
   }
-  setInterval(createHeart, 450);
+
+  function startHearts(){
+    if (heartsInterval) return;
+    heartsInterval = setInterval(createHeart, 320);
+
+    // para criar um "burst" inicial
+    for (let i = 0; i < 10; i++) setTimeout(createHeart, i * 120);
+
+    setTimeout(stopHearts, HEARTS_DURATION_MS);
+  }
+
+  function stopHearts(){
+    if (!heartsInterval) return;
+    clearInterval(heartsInterval);
+    heartsInterval = null;
+
+    // remove rapidamente o que ainda estiver na tela
+    document.querySelectorAll(".heart").forEach(h => h.remove());
+  }
+
+  startHearts(); // inicia ao abrir a página
 
   function playSoftSound(){
     try{
@@ -246,6 +287,9 @@
   }
 
   async function startVideo(){
+    // garante que corações parem ao iniciar o vídeo
+    stopHearts();
+
     start.classList.add("hide");
     setTimeout(()=> start.style.display="none",600);
 
@@ -254,12 +298,11 @@
 
     try{ await video.play(); }catch(e){}
 
-    /* 🎬 FORÇAR TELA CHEIA */
+    // 🎬 Tela cheia
     if (video.requestFullscreen) {
       video.requestFullscreen().catch(()=>{});
     } else if (video.webkitEnterFullscreen) {
-      // iOS Safari
-      video.webkitEnterFullscreen();
+      video.webkitEnterFullscreen(); // iOS Safari
     } else if (video.webkitRequestFullscreen) {
       video.webkitRequestFullscreen();
     }
@@ -281,6 +324,7 @@
 
   start.addEventListener("click", handleStart);
 
+  // fim do vídeo => some o player e aparece a frase final
   video.addEventListener("ended", ()=>{
     video.classList.remove("show");
 
@@ -292,7 +336,13 @@
     setTimeout(()=>{
       video.style.display="none";
       end.classList.add("show");
-    }, 600);
+    }, 500);
+  });
+
+  // "Toque para sair" => reinicia a homenagem (ou você pode trocar para fechar aba)
+  exitBtn.addEventListener("click", ()=>{
+    // opção segura: recarrega a página e volta pro início
+    window.location.reload();
   });
 </script>
 
