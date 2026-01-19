@@ -20,7 +20,6 @@
       color: var(--txt);
     }
 
-    /* Camada de abertura */
     #start{
       position:fixed;
       inset:0;
@@ -65,9 +64,54 @@
       letter-spacing:.2px;
     }
     .subtitle{
-      margin:0 0 14px;
+      margin:0 0 8px;
       color: var(--muted);
       font-size:15px;
+    }
+
+    /* ✅ DATA ANIMADA */
+    .date{
+      display:inline-block;
+      margin-top:10px;
+      padding:8px 14px;
+      border-radius:999px;
+      border:1px solid rgba(255,77,141,.40);
+      background: rgba(255,77,141,.12);
+      font-weight:800;
+      letter-spacing:.6px;
+
+      opacity:0;
+      transform: translateY(8px);
+      filter: blur(1px);
+      transition: opacity .9s ease, transform .9s ease, filter .9s ease;
+      position:relative;
+      overflow:hidden;
+    }
+    /* brilho passando */
+    .date::after{
+      content:"";
+      position:absolute;
+      top:-40%;
+      left:-40%;
+      width:60%;
+      height:180%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,.25), transparent);
+      transform: rotate(20deg);
+      opacity:0;
+    }
+    .date.show{
+      opacity:1;
+      transform: translateY(0);
+      filter: blur(0);
+    }
+    .date.show::after{
+      animation: shine 1.2s ease .35s 1;
+      opacity:1;
+    }
+    @keyframes shine{
+      from{ left:-50%; opacity:0; }
+      30%{ opacity:1; }
+      to{ left:120%; opacity:0; }
     }
 
     .btn{
@@ -75,7 +119,7 @@
       gap:10px;
       align-items:center;
       justify-content:center;
-      margin-top:10px;
+      margin-top:14px;
       padding:12px 16px;
       border-radius:999px;
       background: rgba(255,77,141,.18);
@@ -86,40 +130,11 @@
       transition: transform .15s ease, background .15s ease;
     }
     #start:hover .btn{ transform: translateY(-1px); }
+
     .hint{
       margin-top:10px;
       font-size:13px;
       color: rgba(255,255,255,.7);
-    }
-
-    /* Partículas (corações) */
-    .heart{
-      position:absolute;
-      width:10px;
-      height:10px;
-      transform: rotate(45deg);
-      background: rgba(255,77,141,.32);
-      left: var(--x);
-      bottom: -20px;
-      animation: floatUp var(--t) linear infinite;
-      filter: blur(.2px);
-    }
-    .heart::before,
-    .heart::after{
-      content:"";
-      position:absolute;
-      width:10px;
-      height:10px;
-      border-radius:50%;
-      background: rgba(255,77,141,.32);
-    }
-    .heart::before{ left:-5px; top:0; }
-    .heart::after{ left:0; top:-5px; }
-
-    @keyframes floatUp{
-      from{ transform: translateY(0) rotate(45deg); opacity: 0; }
-      10%{ opacity: .9; }
-      to{ transform: translateY(-120vh) rotate(45deg); opacity: 0; }
     }
 
     video{
@@ -131,25 +146,7 @@
       opacity:0;
       transition: opacity .45s ease;
     }
-    video.show{
-      opacity:1;
-    }
-
-    /* Mensagem final */
-    #end{
-      position:fixed;
-      inset:0;
-      display:none;
-      align-items:center;
-      justify-content:center;
-      text-align:center;
-      padding:24px;
-      background: rgba(0,0,0,.75);
-      z-index:20;
-    }
-    #end .card{
-      font-size:18px;
-    }
+    video.show{ opacity:1; }
 
     @media (max-width: 420px){
       .title{ font-size:20px; }
@@ -164,6 +161,9 @@
       <p class="title">Para você, Thamires 💖</p>
       <p class="subtitle">Um pequeno resumo do início de tudo.</p>
 
+      <!-- ✅ A DATA (vai aparecer suavemente) -->
+      <div id="date" class="date">12/12/2025</div>
+
       <div class="btn">
         <span>Toque aqui para começar</span>
         <span aria-hidden="true">▶</span>
@@ -171,13 +171,6 @@
 
       <div class="hint">Dica: coloque o fone 🎧 e aumente um pouquinho o som.</div>
     </div>
-
-    <!-- corações discretos -->
-    <span class="heart" style="--x:12%;--t:10s;"></span>
-    <span class="heart" style="--x:28%;--t:12s;"></span>
-    <span class="heart" style="--x:47%;--t:11s;"></span>
-    <span class="heart" style="--x:66%;--t:13s;"></span>
-    <span class="heart" style="--x:84%;--t:10.5s;"></span>
   </div>
 
   <video
@@ -191,66 +184,36 @@
     Seu navegador não suporta vídeo.
   </video>
 
-  <div id="end">
-    <div class="card">
-      <p class="title">Fim… só que não 🥰</p>
-      <p style="margin:0;color:rgba(255,255,255,.85);">
-        Se você chegou até aqui, é porque valeu a pena reviver tudo isso.<br>
-        Eu te amo. 💛
-      </p>
-      <div style="margin-top:14px;">
-        <span class="btn" id="replay">Ver de novo ▶</span>
-      </div>
-    </div>
-  </div>
-
   <script>
     const start = document.getElementById("start");
     const v = document.getElementById("v");
-    const end = document.getElementById("end");
-    const replay = document.getElementById("replay");
+    const dateEl = document.getElementById("date");
+
+    // ✅ faz a data aparecer sozinha após um pequeno delay
+    window.addEventListener("load", () => {
+      setTimeout(() => dateEl.classList.add("show"), 450);
+    });
 
     async function startVideo(){
-      // transição suave
       start.classList.add("hide");
       setTimeout(() => { start.style.display = "none"; }, 600);
 
       v.style.display = "block";
       requestAnimationFrame(() => v.classList.add("show"));
 
-      // tenta tocar (precisa de gesto do usuário: o clique já ajuda)
-      try {
-        await v.play();
-      } catch (e) {
-        // Se falhar, o usuário dá play no controle.
-      }
+      try { await v.play(); } catch (e) {}
 
-      // tenta ir para tela cheia (nem sempre funciona no iPhone)
       const requestFS = v.requestFullscreen || v.webkitRequestFullscreen || v.msRequestFullscreen;
-      if (requestFS) {
-        try { requestFS.call(v); } catch (e) {}
-      }
+      if (requestFS) { try { requestFS.call(v); } catch (e) {} }
     }
 
     start.addEventListener("click", startVideo);
 
-    // permitir iniciar com Enter/Espaço (acessibilidade)
     start.addEventListener("keydown", (e) => {
       if (e.key === "Enter" || e.key === " ") {
         e.preventDefault();
         startVideo();
       }
-    });
-
-    // mensagem ao final
-    v.addEventListener("ended", () => {
-      end.style.display = "flex";
-    });
-
-    replay.addEventListener("click", async () => {
-      end.style.display = "none";
-      v.currentTime = 0;
-      try { await v.play(); } catch(e) {}
     });
   </script>
 
