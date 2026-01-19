@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Para Você</title>
+
   <style>
     :root{
       --txt: rgba(255,255,255,.92);
@@ -20,6 +21,7 @@
       color: var(--txt);
     }
 
+    /* ================== ABERTURA ================== */
     #start{
       position:fixed;
       inset:0;
@@ -29,12 +31,11 @@
       text-align:center;
       padding:24px;
       cursor:pointer;
-      user-select:none;
       background:
         radial-gradient(800px 500px at 50% 45%, rgba(255,77,141,.18), transparent 60%),
         radial-gradient(900px 600px at 50% 60%, rgba(255,255,255,.08), transparent 65%),
         #000;
-      transition: opacity .55s ease, transform .55s ease;
+      transition: opacity .6s ease, transform .6s ease;
       z-index:10;
     }
     #start.hide{
@@ -45,91 +46,56 @@
 
     .card{
       max-width:560px;
-      line-height:1.45;
-      font-size:18px;
-      opacity:.98;
       padding:22px 18px;
       border-radius:18px;
       background: rgba(255,255,255,.06);
       border: 1px solid rgba(255,255,255,.12);
       backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
       box-shadow: 0 14px 40px rgba(0,0,0,.45);
-      position:relative;
-      overflow:hidden;
     }
 
     .title{
       font-size:22px;
       margin:0 0 8px;
-      letter-spacing:.2px;
     }
     .subtitle{
-      margin:0 0 8px;
-      color: var(--muted);
+      margin:0 0 10px;
       font-size:15px;
+      color: var(--muted);
     }
 
-    /* DATA ANIMADA (começa escondida) */
     .date{
       display:inline-block;
-      margin-top:10px;
+      margin:8px 0 10px;
       padding:8px 14px;
       border-radius:999px;
-      border:1px solid rgba(255,77,141,.40);
-      background: rgba(255,77,141,.12);
+      background: rgba(255,77,141,.14);
+      border:1px solid rgba(255,77,141,.4);
       font-weight:800;
       letter-spacing:.6px;
 
       opacity:0;
       transform: translateY(8px);
       filter: blur(1px);
-      transition: opacity .9s ease, transform .9s ease, filter .9s ease;
+      transition: all .9s ease;
       position:relative;
       overflow:hidden;
-    }
-    .date::after{
-      content:"";
-      position:absolute;
-      top:-40%;
-      left:-40%;
-      width:60%;
-      height:180%;
-      background: linear-gradient(90deg, transparent, rgba(255,255,255,.25), transparent);
-      transform: rotate(20deg);
-      opacity:0;
     }
     .date.show{
       opacity:1;
       transform: translateY(0);
-      filter: blur(0);
-    }
-    .date.show::after{
-      animation: shine 1.2s ease .25s 1;
-      opacity:1;
-    }
-    @keyframes shine{
-      from{ left:-50%; opacity:0; }
-      30%{ opacity:1; }
-      to{ left:120%; opacity:0; }
+      filter:none;
     }
 
     .btn{
-      display:inline-flex;
-      gap:10px;
-      align-items:center;
-      justify-content:center;
       margin-top:14px;
-      padding:12px 16px;
+      padding:12px 18px;
       border-radius:999px;
       background: rgba(255,77,141,.18);
-      border: 1px solid rgba(255,77,141,.45);
-      color: var(--txt);
+      border:1px solid rgba(255,77,141,.45);
       font-weight:700;
-      transform: translateY(0);
-      transition: transform .15s ease, background .15s ease;
+      display:inline-block;
     }
-    #start:hover .btn{ transform: translateY(-1px); }
 
     .hint{
       margin-top:10px;
@@ -137,6 +103,7 @@
       color: rgba(255,255,255,.7);
     }
 
+    /* ================== VÍDEO ================== */
     video{
       width:100vw;
       height:100vh;
@@ -144,9 +111,40 @@
       background:#000;
       display:none;
       opacity:0;
-      transition: opacity .45s ease;
+      transition: opacity .5s ease;
     }
     video.show{ opacity:1; }
+
+    /* ================== FRASE FINAL ================== */
+    #end{
+      position:fixed;
+      inset:0;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      text-align:center;
+      padding:24px;
+      background:
+        radial-gradient(800px 500px at 50% 45%, rgba(255,77,141,.18), transparent 60%),
+        #000;
+      opacity:0;
+      pointer-events:none;
+      transition: opacity 1s ease;
+      z-index:20;
+    }
+    #end.show{
+      opacity:1;
+      pointer-events:auto;
+    }
+
+    #end .card{
+      animation: fadeUp 1.2s ease forwards;
+    }
+
+    @keyframes fadeUp{
+      from{ opacity:0; transform: translateY(10px); }
+      to{ opacity:1; transform:none; }
+    }
 
     @media (max-width: 420px){
       .title{ font-size:20px; }
@@ -154,127 +152,112 @@
     }
   </style>
 </head>
+
 <body>
 
-  <div id="start" aria-label="Iniciar homenagem" role="button" tabindex="0">
-    <div class="card">
-      <p class="title">Para você, Thamires 💖</p>
-      <p class="subtitle">Um pequeno resumo do início de tudo.</p>
+<!-- ABERTURA -->
+<div id="start">
+  <div class="card">
+    <p class="title">Para você, Thamires 💖</p>
+    <p class="subtitle">Um pequeno resumo do início de tudo.</p>
 
-      <div id="date" class="date">12/12/2025</div>
+    <div id="date" class="date">12/12/2025</div>
 
-      <div class="btn">
-        <span>Toque aqui para começar</span>
-        <span aria-hidden="true">▶</span>
-      </div>
-
-      <div class="hint">Dica: coloque o fone 🎧 e aumente um pouquinho o som.</div>
+    <div class="btn">
+      <span id="btnText">Toque aqui para começar ▶</span>
     </div>
+
+    <div class="hint">Coloque o fone 🎧 e aumente um pouquinho o som.</div>
   </div>
+</div>
 
-  <video
-    id="v"
-    playsinline
-    controls
-    preload="metadata"
-    controlslist="nodownload noplaybackrate"
-  >
-    <source src="./video.mp4" type="video/mp4" />
-    Seu navegador não suporta vídeo.
-  </video>
+<!-- VÍDEO -->
+<video id="v" playsinline controls preload="metadata">
+  <source src="./video.mp4" type="video/mp4">
+</video>
 
-  <script>
-    const start = document.getElementById("start");
-    const v = document.getElementById("v");
-    const dateEl = document.getElementById("date");
-    const btnText = start.querySelector(".btn span:first-child");
+<!-- FRASE FINAL -->
+<div id="end">
+  <div class="card">
+    <p class="title">Desde 12/12/2025</p>
+    <p style="color:rgba(255,255,255,.85);margin:0">
+      eu tenho certeza de uma coisa:<br><br>
+      é com você que eu quero continuar.<br><br>
+      Eu te amo, Thamires. 💛
+    </p>
+  </div>
+</div>
 
-    let stage = 0; // 0 = inicio, 1 = data mostrada, 2 = video
-    let audioCtx = null;
+<script>
+  const start = document.getElementById("start");
+  const video = document.getElementById("v");
+  const dateEl = document.getElementById("date");
+  const btnText = document.getElementById("btnText");
+  const end = document.getElementById("end");
 
-    // Som suave gerado pelo navegador (não precisa de arquivo)
-    function initAudio(){
-      if (!audioCtx) {
-        const AC = window.AudioContext || window.webkitAudioContext;
-        audioCtx = new AC();
+  let stage = 0;
+  let audioCtx = null;
+
+  function playSoftSound(){
+    try{
+      if(!audioCtx){
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
       }
-      // Em alguns celulares, pode vir "suspended" até o toque; tenta liberar:
-      if (audioCtx.state === "suspended") audioCtx.resume().catch(()=>{});
+      const t = audioCtx.currentTime;
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(660, t);
+      osc.frequency.exponentialRampToValueAtTime(520, t + 0.12);
+
+      gain.gain.setValueAtTime(0.001, t);
+      gain.gain.exponentialRampToValueAtTime(0.08, t + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.18);
+
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+
+      osc.start(t);
+      osc.stop(t + 0.2);
+    }catch(e){}
+  }
+
+  async function startVideo(){
+    start.classList.add("hide");
+    setTimeout(()=> start.style.display="none",600);
+
+    video.style.display="block";
+    requestAnimationFrame(()=> video.classList.add("show"));
+
+    try{ await video.play(); }catch(e){}
+  }
+
+  function handleStart(){
+    if(stage === 0){
+      playSoftSound();
+      dateEl.classList.add("show");
+      btnText.textContent = "Agora… vamos lembrar ▶";
+      stage = 1;
+      return;
     }
-
-    function playSoftChime(){
-      try{
-        initAudio();
-
-        const now = audioCtx.currentTime;
-
-        // Oscilador bem suave
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
-
-        // tipo e frequência (leve, "fofinho", nada de alarme)
-        osc.type = "sine";
-        osc.frequency.setValueAtTime(659.25, now); // E5
-        osc.frequency.exponentialRampToValueAtTime(523.25, now + 0.12); // C5
-
-        // volume baixinho com envelope
-        gain.gain.setValueAtTime(0.0001, now);
-        gain.gain.exponentialRampToValueAtTime(0.08, now + 0.02);
-        gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.18);
-
-        osc.connect(gain);
-        gain.connect(audioCtx.destination);
-
-        osc.start(now);
-        osc.stop(now + 0.20);
-      }catch(e){
-        // Se algo bloquear áudio, segue sem som.
-      }
+    if(stage === 1){
+      stage = 2;
+      startVideo();
     }
+  }
 
-    async function startVideo(){
-      start.classList.add("hide");
-      setTimeout(() => { start.style.display = "none"; }, 600);
+  start.addEventListener("click", handleStart);
 
-      v.style.display = "block";
-      requestAnimationFrame(() => v.classList.add("show"));
-
-      try { await v.play(); } catch (e) {}
-
-      const requestFS =
-        v.requestFullscreen ||
-        v.webkitRequestFullscreen ||
-        v.msRequestFullscreen;
-
-      if (requestFS) { try { requestFS.call(v); } catch (e) {} }
-    }
-
-    function handleStart(){
-      if (stage === 0) {
-        // 1º toque: mostra data + som leve + troca texto do botão
-        playSoftChime();
-        dateEl.classList.add("show");
-        btnText.textContent = "Agora… vamos lembrar ▶";
-        stage = 1;
-        return;
-      }
-
-      if (stage === 1) {
-        // 2º toque: inicia o vídeo
-        stage = 2;
-        startVideo();
-      }
-    }
-
-    start.addEventListener("click", handleStart);
-
-    start.addEventListener("keydown", (e) => {
-      if (e.key === "Enter" || e.key === " ") {
-        e.preventDefault();
-        handleStart();
-      }
-    });
-  </script>
+  /* 🎬 QUANDO O VÍDEO TERMINA */
+  video.addEventListener("ended", ()=>{
+    video.classList.remove("show");
+    setTimeout(()=>{
+      video.style.display="none";
+      end.classList.add("show");
+    }, 600);
+  });
+</script>
 
 </body>
 </html>
