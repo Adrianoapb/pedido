@@ -21,7 +21,7 @@
       color: var(--txt);
     }
 
-    /* ================== CORAÇÕES ================== */
+    /* ❤️ CORAÇÕES */
     .heart{
       position:fixed;
       bottom:-20px;
@@ -45,18 +45,12 @@
     .heart::after{ left:0; top:-6px; }
 
     @keyframes floatUp{
-      from{
-        transform: translateY(0) rotate(45deg);
-        opacity:0;
-      }
+      from{ transform: translateY(0) rotate(45deg); opacity:0; }
       10%{ opacity:.8; }
-      to{
-        transform: translateY(-120vh) rotate(45deg);
-        opacity:0;
-      }
+      to{ transform: translateY(-120vh) rotate(45deg); opacity:0; }
     }
 
-    /* ================== ABERTURA ================== */
+    /* ABERTURA */
     #start{
       position:fixed;
       inset:0;
@@ -87,18 +81,10 @@
       backdrop-filter: blur(6px);
       box-shadow: 0 14px 40px rgba(0,0,0,.6);
       z-index:20;
-      position:relative;
     }
 
-    .title{
-      font-size:22px;
-      margin:0 0 8px;
-    }
-    .subtitle{
-      margin:0 0 10px;
-      font-size:15px;
-      color: var(--muted);
-    }
+    .title{ font-size:22px; margin:0 0 8px; }
+    .subtitle{ font-size:15px; color: var(--muted); margin:0 0 10px; }
 
     .date{
       display:inline-block;
@@ -109,7 +95,6 @@
       border:1px solid rgba(255,77,141,.4);
       font-weight:800;
       letter-spacing:.6px;
-
       opacity:0;
       transform: translateY(8px);
       filter: blur(1px);
@@ -137,7 +122,7 @@
       color: rgba(255,255,255,.7);
     }
 
-    /* ================== VÍDEO ================== */
+    /* VÍDEO */
     video{
       width:100vw;
       height:100vh;
@@ -145,12 +130,12 @@
       background:#000;
       display:none;
       opacity:0;
-      transition: opacity .5s ease;
+      transition: opacity .4s ease;
       z-index:5;
     }
     video.show{ opacity:1; }
 
-    /* ================== FINAL ================== */
+    /* FINAL */
     #end{
       position:fixed;
       inset:0;
@@ -197,7 +182,7 @@
 </div>
 
 <!-- VÍDEO -->
-<video id="video" playsinline controls preload="metadata">
+<video id="video" playsinline controls preload="auto">
   <source src="./video.mp4" type="video/mp4">
 </video>
 
@@ -223,7 +208,7 @@
   let stage = 0;
   let audioCtx = null;
 
-  /* ❤️ GERAR CORAÇÕES */
+  /* ❤️ CORAÇÕES */
   function createHeart(){
     const heart = document.createElement("div");
     heart.className = "heart";
@@ -268,6 +253,16 @@
     requestAnimationFrame(()=> video.classList.add("show"));
 
     try{ await video.play(); }catch(e){}
+
+    /* 🎬 FORÇAR TELA CHEIA */
+    if (video.requestFullscreen) {
+      video.requestFullscreen().catch(()=>{});
+    } else if (video.webkitEnterFullscreen) {
+      // iOS Safari
+      video.webkitEnterFullscreen();
+    } else if (video.webkitRequestFullscreen) {
+      video.webkitRequestFullscreen();
+    }
   }
 
   function handleStart(){
@@ -288,6 +283,12 @@
 
   video.addEventListener("ended", ()=>{
     video.classList.remove("show");
+
+    // sai do fullscreen se possível
+    if (document.fullscreenElement) {
+      document.exitFullscreen().catch(()=>{});
+    }
+
     setTimeout(()=>{
       video.style.display="none";
       end.classList.add("show");
