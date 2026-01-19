@@ -61,6 +61,7 @@
       transform: translateY(8px);
       filter: blur(1px);
       transition: opacity .9s ease, transform .9s ease, filter .9s ease;
+      position:relative;
     }
     .butterflies.show{
       opacity:1;
@@ -85,7 +86,6 @@
     /* ✨ Virar luz e sumir */
     .butterflies.light-away .butterfly{
       animation: lightAway 0.95s ease-out forwards;
-      filter: drop-shadow(0 0 0 rgba(255,255,255,0));
     }
     .butterflies.light-away .butterfly:nth-child(1){ --dx:-10px; --dy:-10px; }
     .butterflies.light-away .butterfly:nth-child(2){ --dx:  0px; --dy:-14px; }
@@ -110,6 +110,40 @@
         filter:
           drop-shadow(0 0 28px rgba(255,255,255,.10))
           drop-shadow(0 0 40px rgba(255,77,141,.10));
+      }
+    }
+
+    /* ✨ Partículas de luz */
+    .sparkle{
+      position:absolute;
+      width:6px;
+      height:6px;
+      border-radius:50%;
+      background: rgba(255,255,255,.9);
+      box-shadow:
+        0 0 10px rgba(255,255,255,.55),
+        0 0 18px rgba(255,77,141,.35);
+      left: var(--x);
+      top: var(--y);
+      opacity:0;
+      transform: translate(0,0) scale(0.6);
+      animation: sparklePop 900ms ease-out forwards;
+      pointer-events:none;
+      z-index:50;
+      filter: blur(.1px);
+    }
+
+    @keyframes sparklePop{
+      0%{
+        opacity:0;
+        transform: translate(0,0) scale(0.6);
+      }
+      15%{
+        opacity:1;
+      }
+      100%{
+        opacity:0;
+        transform: translate(var(--dx), var(--dy)) scale(0.25);
       }
     }
 
@@ -144,6 +178,7 @@
       backdrop-filter: blur(6px);
       box-shadow: 0 14px 40px rgba(0,0,0,.6);
       z-index:20;
+      position:relative;
     }
 
     .title{ font-size:22px; margin:0 0 8px; }
@@ -221,7 +256,6 @@
     <p class="title">Para você, Thamires 💖</p>
     <p class="subtitle">Um pequeno resumo do início de tudo.</p>
 
-    <!-- 🦋 BORBOLETAS -->
     <div id="butterflies" class="butterflies">
       <span class="butterfly">🦋</span>
       <span class="butterfly">🦋</span>
@@ -305,6 +339,45 @@
     }catch(e){}
   }
 
+  function spawnSparkles(){
+    // cria partículas no centro do bloco das borboletas
+    const rect = butterflies.getBoundingClientRect();
+
+    // ponto base (centro)
+    const baseX = rect.width / 2;
+    const baseY = rect.height / 2;
+
+    // quantidade discreta
+    const count = 14;
+
+    for(let i=0;i<count;i++){
+      const s = document.createElement("span");
+      s.className = "sparkle";
+
+      // posição inicial (espalhadinha)
+      const x = baseX + (Math.random()*40 - 20);
+      const y = baseY + (Math.random()*18 - 9);
+
+      // direção final
+      const dx = (Math.random()*180 - 90) + "px";
+      const dy = (Math.random()*140 - 90) + "px";
+
+      s.style.setProperty("--x", x + "px");
+      s.style.setProperty("--y", y + "px");
+      s.style.setProperty("--dx", dx);
+      s.style.setProperty("--dy", dy);
+
+      // variação de tamanho
+      const size = 4 + Math.random()*4;
+      s.style.width = size + "px";
+      s.style.height = size + "px";
+
+      butterflies.appendChild(s);
+
+      setTimeout(()=> s.remove(), 1000);
+    }
+  }
+
   async function startVideo(){
     start.classList.add("hide");
     setTimeout(()=>start.style.display="none",600);
@@ -330,12 +403,11 @@
       return;
     }
     if(stage===1){
-      // ✨ 2º toque: borboletas viram luz e somem
+      // ✨ borboletas viram luz + partículas
+      spawnSparkles();
       butterflies.classList.add("light-away");
 
       stage = 2;
-
-      // espera o brilho acontecer e então inicia o vídeo
       setTimeout(startVideo, 550);
     }
   }
