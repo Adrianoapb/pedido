@@ -134,17 +134,9 @@
     }
 
     @keyframes sparklePop{
-      0%{
-        opacity:0;
-        transform: translate(0,0) scale(0.6);
-      }
-      15%{
-        opacity:1;
-      }
-      100%{
-        opacity:0;
-        transform: translate(var(--dx), var(--dy)) scale(0.25);
-      }
+      0%{ opacity:0; transform: translate(0,0) scale(0.6); }
+      15%{ opacity:1; }
+      100%{ opacity:0; transform: translate(var(--dx), var(--dy)) scale(0.25); }
     }
 
     /* ABERTURA */
@@ -182,7 +174,32 @@
     }
 
     .title{ font-size:22px; margin:0 0 8px; }
-    .subtitle{ font-size:15px; color: var(--muted); margin:0 0 6px; }
+    .subtitle{ font-size:15px; color: var(--muted); margin:0 0 10px; }
+
+    /* ✍️ Texto digitando */
+    .typeBox{
+      text-align:left;
+      margin: 10px 0 14px;
+      padding: 12px 14px;
+      border-radius: 14px;
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.10);
+      color: rgba(255,255,255,.88);
+      line-height: 1.45;
+      font-size: 14px;
+      min-height: 92px;
+      white-space: pre-wrap;
+    }
+    .caret{
+      display:inline-block;
+      width:10px;
+      margin-left:2px;
+      color: rgba(255,255,255,.75);
+      animation: blink 1s steps(1) infinite;
+    }
+    @keyframes blink{
+      50%{ opacity:0; }
+    }
 
     .btn{
       margin-top:14px;
@@ -192,8 +209,14 @@
       border:1px solid rgba(255,77,141,.45);
       font-weight:700;
       display:inline-block;
+      transition: transform .15s ease, opacity .2s ease, filter .2s ease;
+      user-select:none;
     }
-
+    .btn.disabled{
+      opacity:.45;
+      filter: grayscale(.2);
+      pointer-events:none;
+    }
     .hint{
       margin-top:10px;
       font-size:13px;
@@ -256,14 +279,19 @@
     <p class="title">Para você, Thamires 💖</p>
     <p class="subtitle">Um pequeno resumo do início de tudo.</p>
 
+    <!-- ✍️ TEXTO DIGITANDO -->
+    <div id="typeBox" class="typeBox">
+      <span id="typed"></span><span id="caret" class="caret">|</span>
+    </div>
+
     <div id="butterflies" class="butterflies">
       <span class="butterfly">🦋</span>
       <span class="butterfly">🦋</span>
       <span class="butterfly">🦋</span>
     </div>
 
-    <div class="btn">
-      <span id="btnText">Toque aqui para reviver o início da nossa história ▶</span>
+    <div id="btn" class="btn disabled">
+      <span id="btnText">Aguarde… ✍️</span>
     </div>
 
     <div class="hint">Coloque o fone 🎧 e aumente um pouquinho o som.</div>
@@ -295,8 +323,14 @@
   const end = document.getElementById("end");
   const exitBtn = document.getElementById("exit");
 
+  // novo
+  const btn = document.getElementById("btn");
+  const typedEl = document.getElementById("typed");
+  const caretEl = document.getElementById("caret");
+
   let stage = 0;
   let audioCtx = null;
+  let typingDone = false;
 
   /* ❤️ CORAÇÕES – poucos segundos */
   let hearts = setInterval(createHeart, 320);
@@ -339,25 +373,18 @@
   }
 
   function spawnSparkles(){
-    // cria partículas no centro do bloco das borboletas
     const rect = butterflies.getBoundingClientRect();
-
-    // ponto base (centro)
     const baseX = rect.width / 2;
     const baseY = rect.height / 2;
-
-    // quantidade discreta
     const count = 14;
 
     for(let i=0;i<count;i++){
       const s = document.createElement("span");
       s.className = "sparkle";
 
-      // posição inicial (espalhadinha)
       const x = baseX + (Math.random()*40 - 20);
       const y = baseY + (Math.random()*18 - 9);
 
-      // direção final
       const dx = (Math.random()*180 - 90) + "px";
       const dy = (Math.random()*140 - 90) + "px";
 
@@ -366,13 +393,11 @@
       s.style.setProperty("--dx", dx);
       s.style.setProperty("--dy", dy);
 
-      // variação de tamanho
       const size = 4 + Math.random()*4;
       s.style.width = size + "px";
       s.style.height = size + "px";
 
       butterflies.appendChild(s);
-
       setTimeout(()=> s.remove(), 1000);
     }
   }
@@ -393,7 +418,48 @@
     }
   }
 
+  // ✍️ EFEITO DIGITAÇÃO
+  const textLines = [
+    "Na vida, surgem momentos em que não esperamos absolutamente nada.",
+    "Mas, às vezes, é justamente desse nada que nasce tudo.",
+    "Que em um simples gesto de cuidado e preocupação por alguém que naquele momento era totalmente desconhecida, poderia sem aviso, se transformar nos cuidados diários por uma pessoa que se torna imensamente importante em minha vida."
+  ];
+
+  const TYPE_SPEED = 22;            // menor = mais rápido
+  const PAUSE_BETWEEN_LINES = 520;  // pausa entre frases
+
+  function sleep(ms){ return new Promise(r => setTimeout(r, ms)); }
+
+  async function typeWriter(lines){
+    typedEl.textContent = "";
+    caretEl.style.display = "inline-block";
+
+    for(let li=0; li<lines.length; li++){
+      const line = lines[li];
+
+      for(let i=0; i<line.length; i++){
+        typedEl.textContent += line[i];
+        await sleep(TYPE_SPEED);
+      }
+
+      if(li < lines.length - 1){
+        typedEl.textContent += "\n\n";
+        await sleep(PAUSE_BETWEEN_LINES);
+      }
+    }
+
+    // terminou
+    caretEl.style.display = "none";
+    typingDone = true;
+
+    btn.classList.remove("disabled");
+    btnText.textContent = "Toque aqui para reviver o início da nossa história ▶";
+  }
+
   function handleStart(){
+    // bloqueia qualquer avanço antes de terminar a digitação
+    if(!typingDone) return;
+
     if(stage===0){
       playSoftSound();
       butterflies.classList.add("show");
@@ -402,16 +468,19 @@
       return;
     }
     if(stage===1){
-      // ✨ borboletas viram luz + partículas
       spawnSparkles();
       butterflies.classList.add("light-away");
-
       stage = 2;
       setTimeout(startVideo, 550);
     }
   }
 
   start.addEventListener("click", handleStart);
+
+  // inicia a digitação automaticamente ao abrir
+  window.addEventListener("load", () => {
+    typeWriter(textLines);
+  });
 
   video.addEventListener("ended", ()=>{
     if(document.fullscreenElement){
@@ -428,6 +497,3 @@
 
 </body>
 </html>
-
-
-
