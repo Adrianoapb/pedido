@@ -19,6 +19,9 @@
       overflow:hidden;
       font-family: Arial, sans-serif;
       color: var(--txt);
+      -webkit-user-select:none;
+      user-select:none;
+      -webkit-tap-highlight-color: transparent;
     }
 
     /* ❤️ CORAÇÕES (tempo curto) */
@@ -187,7 +190,7 @@
       color: rgba(255,255,255,.88);
       line-height: 1.45;
       font-size: 14px;
-      min-height: 92px;
+      min-height: 120px;
       white-space: pre-wrap;
     }
     .caret{
@@ -197,9 +200,7 @@
       color: rgba(255,255,255,.75);
       animation: blink 1s steps(1) infinite;
     }
-    @keyframes blink{
-      50%{ opacity:0; }
-    }
+    @keyframes blink{ 50%{ opacity:0; } }
 
     .btn{
       margin-top:14px;
@@ -209,7 +210,7 @@
       border:1px solid rgba(255,77,141,.45);
       font-weight:700;
       display:inline-block;
-      transition: transform .15s ease, opacity .2s ease, filter .2s ease;
+      transition: opacity .2s ease, filter .2s ease;
       user-select:none;
     }
     .btn.disabled{
@@ -217,6 +218,7 @@
       filter: grayscale(.2);
       pointer-events:none;
     }
+
     .hint{
       margin-top:10px;
       font-size:13px;
@@ -284,14 +286,15 @@
       <span id="typed"></span><span id="caret" class="caret">|</span>
     </div>
 
-    <div id="butterflies" class="butterflies">
+    <div id="butterflies" class="butterflies—from
+      class="butterflies">
       <span class="butterfly">🦋</span>
       <span class="butterfly">🦋</span>
       <span class="butterfly">🦋</span>
     </div>
 
     <div id="btn" class="btn disabled">
-      <span id="btnText">Aguarde… ✍️</span>
+      <span id="btnText">Segure para acelerar… ✍️</span>
     </div>
 
     <div class="hint">Coloque o fone 🎧 e aumente um pouquinho o som.</div>
@@ -323,7 +326,6 @@
   const end = document.getElementById("end");
   const exitBtn = document.getElementById("exit");
 
-  // novo
   const btn = document.getElementById("btn");
   const typedEl = document.getElementById("typed");
   const caretEl = document.getElementById("caret");
@@ -331,6 +333,9 @@
   let stage = 0;
   let audioCtx = null;
   let typingDone = false;
+
+  // aceleração
+  let fastMode = false;
 
   /* ❤️ CORAÇÕES – poucos segundos */
   let hearts = setInterval(createHeart, 320);
@@ -425,8 +430,9 @@
     "Que em um simples gesto de cuidado e preocupação por alguém que naquele momento era totalmente desconhecida, poderia sem aviso, se transformar nos cuidados diários por uma pessoa que se torna imensamente importante em minha vida."
   ];
 
-  const TYPE_SPEED = 22;            // menor = mais rápido
-  const PAUSE_BETWEEN_LINES = 520;  // pausa entre frases
+  const TYPE_SPEED = 26;            // normal
+  const FAST_SPEED = 6;             // acelerado segurando
+  const PAUSE_BETWEEN_LINES = 520;
 
   function sleep(ms){ return new Promise(r => setTimeout(r, ms)); }
 
@@ -439,7 +445,8 @@
 
       for(let i=0; i<line.length; i++){
         typedEl.textContent += line[i];
-        await sleep(TYPE_SPEED);
+        const speed = fastMode ? FAST_SPEED : TYPE_SPEED;
+        await sleep(speed);
       }
 
       if(li < lines.length - 1){
@@ -448,16 +455,13 @@
       }
     }
 
-    // terminou
     caretEl.style.display = "none";
     typingDone = true;
-
     btn.classList.remove("disabled");
     btnText.textContent = "Toque aqui para reviver o início da nossa história ▶";
   }
 
   function handleStart(){
-    // bloqueia qualquer avanço antes de terminar a digitação
     if(!typingDone) return;
 
     if(stage===0){
@@ -477,9 +481,20 @@
 
   start.addEventListener("click", handleStart);
 
-  // inicia a digitação automaticamente ao abrir
-  window.addEventListener("load", () => {
-    typeWriter(textLines);
+  // segurar para acelerar (mouse + toque)
+  function setFast(on){ fastMode = on; }
+
+  start.addEventListener("mousedown", ()=>setFast(true));
+  start.addEventListener("mouseup", ()=>setFast(false));
+  start.addEventListener("mouseleave", ()=>setFast(false));
+  start.addEventListener("touchstart", ()=>setFast(true), {passive:true});
+  start.addEventListener("touchend", ()=>setFast(false), {passive:true});
+  start.addEventListener("touchcancel", ()=>setFast(false), {passive:true});
+
+  // inicia a digitação assim que o DOM estiver pronto (mais confiável que load)
+  document.addEventListener("DOMContentLoaded", () => {
+    // pequeno atraso só pra garantir que tudo já foi pintado na tela
+    setTimeout(()=> typeWriter(textLines), 80);
   });
 
   video.addEventListener("ended", ()=>{
