@@ -151,7 +151,6 @@
       justify-content:center;
       text-align:center;
       padding:24px;
-      cursor:pointer;
       background:
         radial-gradient(800px 500px at 50% 45%, rgba(255,77,141,.18), transparent 60%),
         #000;
@@ -202,6 +201,7 @@
     }
     @keyframes blink{ 50%{ opacity:0; } }
 
+    /* ✅ BOTÃO FIXO / SEM “SUMIR” */
     .btn{
       margin-top:14px;
       padding:12px 18px;
@@ -210,13 +210,18 @@
       border:1px solid rgba(255,77,141,.45);
       font-weight:700;
       display:inline-block;
-      transition: opacity .2s ease, filter .2s ease;
+      transition: opacity .2s ease, filter .2s ease, transform .2s ease;
       user-select:none;
+      cursor:pointer;
+      position:relative;
+      z-index:50; /* garante acima das animações */
     }
+    .btn:active{ transform: scale(.98); }
     .btn.disabled{
       opacity:.45;
       filter: grayscale(.2);
       pointer-events:none;
+      cursor:default;
     }
 
     .hint{
@@ -286,13 +291,13 @@
       <span id="typed"></span><span id="caret" class="caret">|</span>
     </div>
 
-    <!-- ✅ CORRIGIDO AQUI -->
     <div id="butterflies" class="butterflies">
       <span class="butterfly">🦋</span>
       <span class="butterfly">🦋</span>
       <span class="butterfly">🦋</span>
     </div>
 
+    <!-- ✅ AGORA O CLIQUE É SÓ AQUI -->
     <div id="btn" class="btn disabled">
       <span id="btnText">Segure para acelerar… ✍️</span>
     </div>
@@ -479,7 +484,9 @@
       stage = 1;
       return;
     }
+
     if(stage===1){
+      btn.classList.add("disabled"); // evita clique repetido
       spawnSparkles();
       butterflies.classList.add("light-away");
       stage = 2;
@@ -487,19 +494,23 @@
     }
   }
 
-  start.addEventListener("click", handleStart);
+  // ✅ CLIQUE SOMENTE NO BOTÃO (não na tela inteira)
+  btn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    handleStart();
+  });
 
-  // segurar para acelerar (mouse + toque)
+  // segurar para acelerar (mouse + toque) no botão
   function setFast(on){ fastMode = on; }
 
-  start.addEventListener("mousedown", ()=>setFast(true));
-  start.addEventListener("mouseup", ()=>setFast(false));
-  start.addEventListener("mouseleave", ()=>setFast(false));
-  start.addEventListener("touchstart", ()=>setFast(true), {passive:true});
-  start.addEventListener("touchend", ()=>setFast(false), {passive:true});
-  start.addEventListener("touchcancel", ()=>setFast(false), {passive:true});
+  btn.addEventListener("mousedown", ()=>setFast(true));
+  btn.addEventListener("mouseup", ()=>setFast(false));
+  btn.addEventListener("mouseleave", ()=>setFast(false));
+  btn.addEventListener("touchstart", ()=>setFast(true), {passive:true});
+  btn.addEventListener("touchend", ()=>setFast(false), {passive:true});
+  btn.addEventListener("touchcancel", ()=>setFast(false), {passive:true});
 
-  // inicia a digitação assim que o DOM estiver pronto
+  // inicia a digitação
   document.addEventListener("DOMContentLoaded", () => {
     setTimeout(()=> typeWriter(textLines), 80);
   });
