@@ -19,12 +19,11 @@
       overflow:hidden;
       font-family: Arial, sans-serif;
       color: var(--txt);
-      -webkit-user-select:none;
       user-select:none;
       -webkit-tap-highlight-color: transparent;
     }
 
-    /* ❤️ CORAÇÕES (tempo curto) */
+    /* ❤️ CORAÇÕES */
     .heart{
       position:fixed;
       bottom:-20px;
@@ -36,8 +35,7 @@
       z-index:1;
       pointer-events:none;
     }
-    .heart::before,
-    .heart::after{
+    .heart::before,.heart::after{
       content:"";
       position:absolute;
       width:12px;
@@ -63,7 +61,7 @@
       opacity:0;
       transform: translateY(8px);
       filter: blur(1px);
-      transition: opacity .9s ease, transform .9s ease, filter .9s ease;
+      transition: .9s;
       position:relative;
     }
     .butterflies.show{
@@ -75,71 +73,13 @@
     .butterfly{
       font-size:28px;
       animation: flutter 1.6s ease-in-out infinite;
-      display:inline-block;
-      transform-origin:center;
     }
     .butterfly:nth-child(2){ animation-delay:.2s; }
     .butterfly:nth-child(3){ animation-delay:.4s; }
 
     @keyframes flutter{
-      0%,100%{ transform: translateY(0) rotate(0deg); }
-      50%{ transform: translateY(-6px) rotate(6deg); }
-    }
-
-    /* ✨ Virar luz e sumir */
-    .butterflies.light-away .butterfly{
-      animation: lightAway 0.95s ease-out forwards;
-    }
-    .butterflies.light-away .butterfly:nth-child(1){ --dx:-10px; --dy:-10px; }
-    .butterflies.light-away .butterfly:nth-child(2){ --dx:  0px; --dy:-14px; }
-    .butterflies.light-away .butterfly:nth-child(3){ --dx: 10px; --dy:-10px; }
-
-    @keyframes lightAway{
-      0%{
-        opacity:1;
-        transform: translate(0,0) scale(1);
-        filter: drop-shadow(0 0 0 rgba(255,255,255,0));
-      }
-      45%{
-        opacity:1;
-        transform: translate(var(--dx), var(--dy)) scale(1.15);
-        filter:
-          drop-shadow(0 0 10px rgba(255,255,255,.55))
-          drop-shadow(0 0 22px rgba(255,77,141,.45));
-      }
-      100%{
-        opacity:0;
-        transform: translate(calc(var(--dx) * 2), calc(var(--dy) * 2)) scale(1.6);
-        filter:
-          drop-shadow(0 0 28px rgba(255,255,255,.10))
-          drop-shadow(0 0 40px rgba(255,77,141,.10));
-      }
-    }
-
-    /* ✨ Partículas de luz */
-    .sparkle{
-      position:absolute;
-      width:6px;
-      height:6px;
-      border-radius:50%;
-      background: rgba(255,255,255,.9);
-      box-shadow:
-        0 0 10px rgba(255,255,255,.55),
-        0 0 18px rgba(255,77,141,.35);
-      left: var(--x);
-      top: var(--y);
-      opacity:0;
-      transform: translate(0,0) scale(0.6);
-      animation: sparklePop 900ms ease-out forwards;
-      pointer-events:none;
-      z-index:50;
-      filter: blur(.1px);
-    }
-
-    @keyframes sparklePop{
-      0%{ opacity:0; transform: translate(0,0) scale(0.6); }
-      15%{ opacity:1; }
-      100%{ opacity:0; transform: translate(var(--dx), var(--dy)) scale(0.25); }
+      0%,100%{ transform: translateY(0); }
+      50%{ transform: translateY(-6px); }
     }
 
     /* ABERTURA */
@@ -149,59 +89,65 @@
       display:flex;
       align-items:center;
       justify-content:center;
-      text-align:center;
       padding:24px;
       background:
         radial-gradient(800px 500px at 50% 45%, rgba(255,77,141,.18), transparent 60%),
         #000;
-      transition: opacity .6s ease, transform .6s ease;
       z-index:10;
     }
     #start.hide{
       opacity:0;
-      transform: scale(1.02);
       pointer-events:none;
+      transform: scale(1.02);
+      transition:.6s;
     }
 
     .card{
       max-width:560px;
+      width:100%;
       padding:22px 18px;
       border-radius:18px;
       background: rgba(0,0,0,.55);
       border:1px solid rgba(255,255,255,.12);
       backdrop-filter: blur(6px);
       box-shadow: 0 14px 40px rgba(0,0,0,.6);
-      z-index:20;
-      position:relative;
     }
 
     .title{ font-size:22px; margin:0 0 8px; }
     .subtitle{ font-size:15px; color: var(--muted); margin:0 0 10px; }
 
-    /* ✍️ Texto digitando */
+    /* ✍️ TEXTO LIMITADO (NÃO EMPURRA O BOTÃO) */
     .typeBox{
-      text-align:left;
-      margin: 10px 0 14px;
-      padding: 12px 14px;
-      border-radius: 14px;
+      margin:10px 0 14px;
+      padding:12px 14px;
+      border-radius:14px;
       background: rgba(255,255,255,.06);
-      border: 1px solid rgba(255,255,255,.10);
+      border:1px solid rgba(255,255,255,.10);
       color: rgba(255,255,255,.88);
-      line-height: 1.45;
-      font-size: 14px;
-      min-height: 120px;
+      line-height:1.45;
+      font-size:14px;
+
+      height: min(38vh, 220px); /* ✅ limite de altura */
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+
       white-space: pre-wrap;
     }
+
+    .typeBox::-webkit-scrollbar{ width:6px; }
+    .typeBox::-webkit-scrollbar-thumb{
+      background: rgba(255,255,255,.18);
+      border-radius:10px;
+    }
+
     .caret{
       display:inline-block;
       width:10px;
-      margin-left:2px;
-      color: rgba(255,255,255,.75);
       animation: blink 1s steps(1) infinite;
     }
     @keyframes blink{ 50%{ opacity:0; } }
 
-    /* ✅ BOTÃO FIXO / SEM “SUMIR” */
+    /* BOTÃO */
     .btn{
       margin-top:14px;
       padding:12px 18px;
@@ -209,19 +155,13 @@
       background: rgba(255,77,141,.18);
       border:1px solid rgba(255,77,141,.45);
       font-weight:700;
-      display:inline-block;
-      transition: opacity .2s ease, filter .2s ease, transform .2s ease;
-      user-select:none;
       cursor:pointer;
-      position:relative;
-      z-index:50; /* garante acima das animações */
+      text-align:center;
+      z-index:50;
     }
-    .btn:active{ transform: scale(.98); }
     .btn.disabled{
       opacity:.45;
-      filter: grayscale(.2);
       pointer-events:none;
-      cursor:default;
     }
 
     .hint{
@@ -237,11 +177,7 @@
       object-fit:contain;
       background:#000;
       display:none;
-      opacity:0;
-      transition: opacity .4s ease;
-      z-index:5;
     }
-    video.show{ opacity:1; }
 
     /* FINAL */
     #end{
@@ -250,15 +186,10 @@
       display:flex;
       align-items:center;
       justify-content:center;
-      text-align:center;
-      padding:24px;
-      background:
-        radial-gradient(800px 500px at 50% 45%, rgba(255,77,141,.18), transparent 60%),
-        #000;
+      background:#000;
       opacity:0;
       pointer-events:none;
-      transition: opacity 1s ease;
-      z-index:30;
+      transition:1s;
     }
     #end.show{
       opacity:1;
@@ -273,22 +204,19 @@
       border:1px solid rgba(255,255,255,.22);
       font-weight:700;
       cursor:pointer;
-      display:inline-block;
     }
   </style>
 </head>
 
 <body>
 
-<!-- ABERTURA -->
 <div id="start">
   <div class="card">
     <p class="title">Para você, Thamires 💖</p>
-    <p class="subtitle">Um pequeno resumo do início de tudo.</p>
+    <p class="subtitle">Um resumo de uma parte de nossa hitória.</p>
 
-    <!-- ✍️ TEXTO DIGITANDO -->
-    <div id="typeBox" class="typeBox">
-      <span id="typed"></span><span id="caret" class="caret">|</span>
+    <div class="typeBox">
+      <span id="typed"></span><span class="caret">|</span>
     </div>
 
     <div id="butterflies" class="butterflies">
@@ -297,235 +225,83 @@
       <span class="butterfly">🦋</span>
     </div>
 
-    <!-- ✅ AGORA O CLIQUE É SÓ AQUI -->
-    <div id="btn" class="btn disabled">
-      <span id="btnText">Segure para acelerar… ✍️</span>
-    </div>
-
+    <div id="btn" class="btn disabled">Segure para acelerar… ✍️</div>
     <div class="hint">Coloque o fone 🎧 e aumente um pouquinho o som.</div>
   </div>
 </div>
 
-<!-- VÍDEO -->
-<video id="video" playsinline preload="auto">
+<video id="video">
   <source src="./video.mp4" type="video/mp4">
 </video>
 
-<!-- FINAL -->
 <div id="end">
   <div class="card">
-    <p class="title">Te amo, Thamires. 💛</p>
-    <p style="color:rgba(255,255,255,.85);margin:0">
-      Essa é só uma lembrança…<br><br>
-      de muitas que ainda vamos criar juntos.<br><br>
-    </p>
-    <div id="exit" class="exitBtn">Toque para sair ✨</div>
+    <p class="title">Te amo, Thamires 💛</p>
+    <p>Essa é só uma lembrança…<br><br>de muitas que ainda vamos criar juntos.</p>
+    <div class="exitBtn" onclick="location.reload()">Toque para sair ✨</div>
   </div>
 </div>
 
 <script>
+  const typed = document.getElementById("typed");
+  const btn = document.getElementById("btn");
+  const butterflies = document.getElementById("butterflies");
   const start = document.getElementById("start");
   const video = document.getElementById("video");
-  const butterflies = document.getElementById("butterflies");
-  const btnText = document.getElementById("btnText");
   const end = document.getElementById("end");
-  const exitBtn = document.getElementById("exit");
 
-  const btn = document.getElementById("btn");
-  const typedEl = document.getElementById("typed");
-  const caretEl = document.getElementById("caret");
-
-  let stage = 0;
-  let audioCtx = null;
-  let typingDone = false;
-
-  // aceleração
-  let fastMode = false;
-
-  /* ❤️ CORAÇÕES – poucos segundos */
-  let hearts = setInterval(createHeart, 320);
-  setTimeout(() => {
-    clearInterval(hearts);
-    document.querySelectorAll(".heart").forEach(h => h.remove());
-  }, 5000);
-
-  function createHeart(){
-    const h = document.createElement("div");
-    h.className = "heart";
-    h.style.left = Math.random()*100 + "vw";
-    h.style.animationDuration = (6 + Math.random()*4) + "s";
-    document.body.appendChild(h);
-    setTimeout(()=>h.remove(),10000);
-  }
-
-  function playSoftSound(){
-    try{
-      if(!audioCtx){
-        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-      }
-      const t = audioCtx.currentTime;
-      const osc = audioCtx.createOscillator();
-      const gain = audioCtx.createGain();
-
-      osc.type = "sine";
-      osc.frequency.setValueAtTime(660, t);
-      osc.frequency.exponentialRampToValueAtTime(520, t + 0.12);
-
-      gain.gain.setValueAtTime(0.001, t);
-      gain.gain.exponentialRampToValueAtTime(0.08, t + 0.02);
-      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.18);
-
-      osc.connect(gain);
-      gain.connect(audioCtx.destination);
-      osc.start(t);
-      osc.stop(t + 0.2);
-    }catch(e){}
-  }
-
-  function spawnSparkles(){
-    const rect = butterflies.getBoundingClientRect();
-    const baseX = rect.width / 2;
-    const baseY = rect.height / 2;
-    const count = 14;
-
-    for(let i=0;i<count;i++){
-      const s = document.createElement("span");
-      s.className = "sparkle";
-
-      const x = baseX + (Math.random()*40 - 20);
-      const y = baseY + (Math.random()*18 - 9);
-
-      const dx = (Math.random()*180 - 90) + "px";
-      const dy = (Math.random()*140 - 90) + "px";
-
-      s.style.setProperty("--x", x + "px");
-      s.style.setProperty("--y", y + "px");
-      s.style.setProperty("--dx", dx);
-      s.style.setProperty("--dy", dy);
-
-      const size = 4 + Math.random()*4;
-      s.style.width = size + "px";
-      s.style.height = size + "px";
-
-      butterflies.appendChild(s);
-      setTimeout(()=> s.remove(), 1000);
-    }
-  }
-
-  async function startVideo(){
-    start.classList.add("hide");
-    setTimeout(()=>start.style.display="none",600);
-
-    video.style.display="block";
-    requestAnimationFrame(()=>video.classList.add("show"));
-
-    try{ await video.play(); }catch(e){}
-
-    if(video.requestFullscreen){
-      video.requestFullscreen().catch(()=>{});
-    }else if(video.webkitEnterFullscreen){
-      video.webkitEnterFullscreen();
-    }
-  }
-
-  // ✍️ EFEITO DIGITAÇÃO
-  const textLines = [
+  const text = [
     "Na vida, existem momentos em que não esperamos absolutamente nada.",
-    "São fases em que ficamos descrentes da felicidade e do amor,",
-    "perdendo a esperança de que um dia possamos encontrar alguém",
-    "capaz de nos fazer verdadeiramente felizes.",
-    "Mas a vida tem o costume de nos surpreender justamente quando menos esperamos.",
-    "De repente, surge alguém sem aviso, em um momento improvável e em uma situação que eu jamais imaginei.",
-    "E, a partir daquele dia, aos poucos,",
-    "essa pessoa foi se tornando cada vez mais especial, até chegar ao ponto de se tornar responsável pelos meus sorrisos,",
-    "pelas minhas inspirações e pelos meus melhores sentimentos.",
-    "O que antes era um tempo de vazio e incerteza, hoje é tudo.",
-    "E é esse encontro inesperado que resolvi transformar nesse pequeno resumo da nossa história...",
+    "Mas a vida adora surpreender quando menos esperamos.",
+    "De repente surge alguém.",
+    "E tudo muda.",
+    "Esse alguém é você."
   ];
 
-  const TYPE_SPEED = 26;            // normal
-  const FAST_SPEED = 6;             // acelerado segurando
-  const PAUSE_BETWEEN_LINES = 520;
+  let fast = false;
+  let stage = 0;
 
-  function sleep(ms){ return new Promise(r => setTimeout(r, ms)); }
+  function sleep(ms){ return new Promise(r=>setTimeout(r,ms)); }
 
-  async function typeWriter(lines){
-    typedEl.textContent = "";
-    caretEl.style.display = "inline-block";
-
-    for(let li=0; li<lines.length; li++){
-      const line = lines[li];
-
-      for(let i=0; i<line.length; i++){
-        typedEl.textContent += line[i];
-        const speed = fastMode ? FAST_SPEED : TYPE_SPEED;
-        await sleep(speed);
+  async function typeText(){
+    for(let line of text){
+      for(let c of line){
+        typed.textContent += c;
+        await sleep(fast ? 6 : 26);
       }
-
-      if(li < lines.length - 1){
-        typedEl.textContent += "\n\n";
-        await sleep(li === lines.length - 2 ? 1200 : PAUSE_BETWEEN_LINES);
-      }
+      typed.textContent += "\n\n";
+      await sleep(400);
     }
-
-    caretEl.style.display = "none";
-    typingDone = true;
     btn.classList.remove("disabled");
-    btnText.textContent = "Toque aqui para reviver o início da nossa história ▶";
+    btn.textContent = "Toque para seguir ▶";
   }
 
-  function handleStart(){
-    if(!typingDone) return;
+  btn.addEventListener("mousedown",()=>fast=true);
+  btn.addEventListener("mouseup",()=>fast=false);
+  btn.addEventListener("touchstart",()=>fast=true,{passive:true});
+  btn.addEventListener("touchend",()=>fast=false,{passive:true});
 
+  btn.addEventListener("click",()=>{
     if(stage===0){
-      playSoftSound();
       butterflies.classList.add("show");
-      btnText.textContent = "Agora… vamos lembrar ▶";
-      stage = 1;
+      btn.textContent="Agora… vamos lembrar ▶";
+      stage=1;
       return;
     }
-
     if(stage===1){
-      btn.classList.add("disabled"); // evita clique repetido
-      spawnSparkles();
-      butterflies.classList.add("light-away");
-      stage = 2;
-      setTimeout(startVideo, 550);
+      start.classList.add("hide");
+      video.style.display="block";
+      video.play();
+      stage=2;
     }
-  }
-
-  // ✅ CLIQUE SOMENTE NO BOTÃO (não na tela inteira)
-  btn.addEventListener("click", (e) => {
-    e.stopPropagation();
-    handleStart();
   });
 
-  // segurar para acelerar (mouse + toque) no botão
-  function setFast(on){ fastMode = on; }
-
-  btn.addEventListener("mousedown", ()=>setFast(true));
-  btn.addEventListener("mouseup", ()=>setFast(false));
-  btn.addEventListener("mouseleave", ()=>setFast(false));
-  btn.addEventListener("touchstart", ()=>setFast(true), {passive:true});
-  btn.addEventListener("touchend", ()=>setFast(false), {passive:true});
-  btn.addEventListener("touchcancel", ()=>setFast(false), {passive:true});
-
-  // inicia a digitação
-  document.addEventListener("DOMContentLoaded", () => {
-    setTimeout(()=> typeWriter(textLines), 80);
-  });
-
-  video.addEventListener("ended", ()=>{
-    if(document.fullscreenElement){
-      document.exitFullscreen().catch(()=>{});
-    }
+  video.addEventListener("ended",()=>{
     video.style.display="none";
     end.classList.add("show");
   });
 
-  exitBtn.addEventListener("click", ()=>{
-    window.location.reload();
-  });
+  setTimeout(typeText,100);
 </script>
 
 </body>
