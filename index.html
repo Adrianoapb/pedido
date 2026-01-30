@@ -1,211 +1,148 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Para Você</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Para Você</title>
 
-  <style>
-    :root{
-      --txt: rgba(255,255,255,.92);
-      --muted: rgba(255,255,255,.75);
-      --accent: #ff4d8d;
-    }
+<style>
+:root{
+  --txt: rgba(255,255,255,.92);
+  --muted: rgba(255,255,255,.75);
+}
 
-    body{
-      margin:0;
-      background:#000;
-      height:100vh;
-      overflow:hidden;
-      font-family: Arial, sans-serif;
-      color: var(--txt);
-      user-select:none;
-      -webkit-tap-highlight-color: transparent;
-    }
+body{
+  margin:0;
+  background:#000;
+  height:100vh;
+  overflow:hidden;
+  font-family: Arial, sans-serif;
+  color:var(--txt);
+  user-select:none;
+}
 
-    /* ❤️ CORAÇÕES */
-    .heart{
-      position:fixed;
-      bottom:-20px;
-      width:12px;
-      height:12px;
-      background: rgba(255,77,141,.35);
-      transform: rotate(45deg);
-      animation: floatUp linear infinite;
-      z-index:1;
-      pointer-events:none;
-    }
-    .heart::before,.heart::after{
-      content:"";
-      position:absolute;
-      width:12px;
-      height:12px;
-      background: rgba(255,77,141,.35);
-      border-radius:50%;
-    }
-    .heart::before{ left:-6px; top:0; }
-    .heart::after{ left:0; top:-6px; }
+/* ABERTURA */
+#start{
+  position:fixed;
+  inset:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+  background:#000;
+}
 
-    @keyframes floatUp{
-      from{ transform: translateY(0) rotate(45deg); opacity:0; }
-      10%{ opacity:.8; }
-      to{ transform: translateY(-120vh) rotate(45deg); opacity:0; }
-    }
+.card{
+  width:100%;
+  max-width:560px;
+  background:rgba(0,0,0,.6);
+  border-radius:18px;
+  padding:20px;
+  border:1px solid rgba(255,255,255,.15);
+}
 
-    /* 🦋 BORBOLETAS */
-    .butterflies{
-      display:flex;
-      justify-content:center;
-      gap:16px;
-      margin:10px 0;
-      opacity:0;
-      transform: translateY(8px);
-      filter: blur(1px);
-      transition: .9s;
-      position:relative;
-    }
-    .butterflies.show{
-      opacity:1;
-      transform: translateY(0);
-      filter:none;
-    }
+.title{ font-size:22px; margin:0 0 6px; }
+.subtitle{ font-size:15px; color:var(--muted); margin-bottom:10px; }
 
-    .butterfly{
-      font-size:28px;
-      animation: flutter 1.6s ease-in-out infinite;
-    }
-    .butterfly:nth-child(2){ animation-delay:.2s; }
-    .butterfly:nth-child(3){ animation-delay:.4s; }
+/* ✍️ TEXTO COMPLETO COM ROLAGEM */
+.typeBox{
+  margin:10px 0 14px;
+  padding:12px 14px;
+  border-radius:14px;
+  background:rgba(255,255,255,.06);
+  border:1px solid rgba(255,255,255,.10);
+  font-size:14px;
+  line-height:1.45;
+  white-space:pre-wrap;
 
-    @keyframes flutter{
-      0%,100%{ transform: translateY(0); }
-      50%{ transform: translateY(-6px); }
-    }
+  height: min(40vh, 240px); /* ⭐ limite da caixa */
+  overflow-y:auto;
+  -webkit-overflow-scrolling: touch;
+}
 
-    /* ABERTURA */
-    #start{
-      position:fixed;
-      inset:0;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      padding:24px;
-      background:
-        radial-gradient(800px 500px at 50% 45%, rgba(255,77,141,.18), transparent 60%),
-        #000;
-      z-index:10;
-    }
-    #start.hide{
-      opacity:0;
-      pointer-events:none;
-      transform: scale(1.02);
-      transition:.6s;
-    }
+/* scrollbar discreta */
+.typeBox::-webkit-scrollbar{ width:6px; }
+.typeBox::-webkit-scrollbar-thumb{
+  background:rgba(255,255,255,.2);
+  border-radius:10px;
+}
 
-    .card{
-      max-width:560px;
-      width:100%;
-      padding:22px 18px;
-      border-radius:18px;
-      background: rgba(0,0,0,.55);
-      border:1px solid rgba(255,255,255,.12);
-      backdrop-filter: blur(6px);
-      box-shadow: 0 14px 40px rgba(0,0,0,.6);
-    }
+.caret{
+  display:inline-block;
+  width:10px;
+  animation:blink 1s steps(1) infinite;
+}
+@keyframes blink{50%{opacity:0;}}
 
-    .title{ font-size:22px; margin:0 0 8px; }
-    .subtitle{ font-size:15px; color: var(--muted); margin:0 0 10px; }
+/* BORBOLETAS */
+.butterflies{
+  display:flex;
+  justify-content:center;
+  gap:16px;
+  margin:10px 0;
+  opacity:0;
+  transition:.8s;
+}
+.butterflies.show{ opacity:1; }
+.butterfly{ font-size:28px; }
 
-    /* ✍️ TEXTO LIMITADO (NÃO EMPURRA O BOTÃO) */
-    .typeBox{
-      margin:10px 0 14px;
-      padding:12px 14px;
-      border-radius:14px;
-      background: rgba(255,255,255,.06);
-      border:1px solid rgba(255,255,255,.10);
-      color: rgba(255,255,255,.88);
-      line-height:1.45;
-      font-size:14px;
+/* BOTÃO */
+.btn{
+  margin-top:14px;
+  padding:12px 18px;
+  border-radius:999px;
+  background:rgba(255,77,141,.18);
+  border:1px solid rgba(255,77,141,.45);
+  font-weight:700;
+  text-align:center;
+  cursor:pointer;
+}
+.btn.disabled{
+  opacity:.4;
+  pointer-events:none;
+}
 
-      height: min(38vh, 220px); /* ✅ limite de altura */
-      overflow-y: auto;
-      -webkit-overflow-scrolling: touch;
+.hint{
+  margin-top:8px;
+  font-size:13px;
+  color:var(--muted);
+}
 
-      white-space: pre-wrap;
-    }
+/* VÍDEO */
+video{
+  width:100vw;
+  height:100vh;
+  background:#000;
+  object-fit:contain;
+  display:none;
+}
 
-    .typeBox::-webkit-scrollbar{ width:6px; }
-    .typeBox::-webkit-scrollbar-thumb{
-      background: rgba(255,255,255,.18);
-      border-radius:10px;
-    }
-
-    .caret{
-      display:inline-block;
-      width:10px;
-      animation: blink 1s steps(1) infinite;
-    }
-    @keyframes blink{ 50%{ opacity:0; } }
-
-    /* BOTÃO */
-    .btn{
-      margin-top:14px;
-      padding:12px 18px;
-      border-radius:999px;
-      background: rgba(255,77,141,.18);
-      border:1px solid rgba(255,77,141,.45);
-      font-weight:700;
-      cursor:pointer;
-      text-align:center;
-      z-index:50;
-    }
-    .btn.disabled{
-      opacity:.45;
-      pointer-events:none;
-    }
-
-    .hint{
-      margin-top:10px;
-      font-size:13px;
-      color: rgba(255,255,255,.7);
-    }
-
-    /* VÍDEO */
-    video{
-      width:100vw;
-      height:100vh;
-      object-fit:contain;
-      background:#000;
-      display:none;
-    }
-
-    /* FINAL */
-    #end{
-      position:fixed;
-      inset:0;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      background:#000;
-      opacity:0;
-      pointer-events:none;
-      transition:1s;
-    }
-    #end.show{
-      opacity:1;
-      pointer-events:auto;
-    }
-
-    .exitBtn{
-      margin-top:18px;
-      padding:12px 18px;
-      border-radius:999px;
-      background: rgba(255,255,255,.10);
-      border:1px solid rgba(255,255,255,.22);
-      font-weight:700;
-      cursor:pointer;
-    }
-  </style>
+/* FINAL */
+#end{
+  position:fixed;
+  inset:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:#000;
+  opacity:0;
+  pointer-events:none;
+  transition:1s;
+}
+#end.show{
+  opacity:1;
+  pointer-events:auto;
+}
+.exitBtn{
+  margin-top:16px;
+  padding:12px 18px;
+  border-radius:999px;
+  background:rgba(255,255,255,.12);
+  border:1px solid rgba(255,255,255,.25);
+  font-weight:700;
+  cursor:pointer;
+}
+</style>
 </head>
 
 <body>
@@ -213,7 +150,7 @@
 <div id="start">
   <div class="card">
     <p class="title">Para você, Thamires 💖</p>
-    <p class="subtitle">Um resumo de uma parte de nossa hitória.</p>
+    <p class="subtitle">Um pequeno resumo do início de tudo.</p>
 
     <div class="typeBox">
       <span id="typed"></span><span class="caret">|</span>
@@ -243,65 +180,71 @@
 </div>
 
 <script>
-  const typed = document.getElementById("typed");
-  const btn = document.getElementById("btn");
-  const butterflies = document.getElementById("butterflies");
-  const start = document.getElementById("start");
-  const video = document.getElementById("video");
-  const end = document.getElementById("end");
+const typed = document.getElementById("typed");
+const btn = document.getElementById("btn");
+const butterflies = document.getElementById("butterflies");
+const start = document.getElementById("start");
+const video = document.getElementById("video");
+const end = document.getElementById("end");
 
-  const text = [
-    "Na vida, existem momentos em que não esperamos absolutamente nada.",
-    "Mas a vida adora surpreender quando menos esperamos.",
-    "De repente surge alguém.",
-    "E tudo muda.",
-    "Esse alguém é você."
-  ];
+const textLines = [
+  "Na vida, existem momentos em que não esperamos absolutamente nada.",
+  "São fases em que ficamos descrentes da felicidade e do amor,",
+  "perdendo a esperança de que um dia possamos encontrar alguém",
+  "capaz de nos fazer verdadeiramente felizes.",
+  "Mas a vida tem o costume de nos surpreender justamente quando menos esperamos.",
+  "De repente, surge alguém sem aviso, em um momento improvável e em uma situação que eu jamais imaginei.",
+  "E, a partir daquele dia, aos poucos,",
+  "essa pessoa foi se tornando cada vez mais especial, até chegar ao ponto de se tornar responsável pelos meus sorrisos,",
+  "pelas minhas inspirações e pelos meus melhores sentimentos.",
+  "O que antes era um tempo de vazio e incerteza, hoje é tudo.",
+  "E é esse encontro inesperado que resolvi transformar nesse pequeno resumo da nossa história..."
+];
 
-  let fast = false;
-  let stage = 0;
+let fast = false;
+let stage = 0;
 
-  function sleep(ms){ return new Promise(r=>setTimeout(r,ms)); }
+function sleep(ms){ return new Promise(r=>setTimeout(r,ms)); }
 
-  async function typeText(){
-    for(let line of text){
-      for(let c of line){
-        typed.textContent += c;
-        await sleep(fast ? 6 : 26);
-      }
-      typed.textContent += "\n\n";
-      await sleep(400);
+async function typeWriter(){
+  for(let line of textLines){
+    for(let c of line){
+      typed.textContent += c;
+      await sleep(fast ? 6 : 26);
     }
-    btn.classList.remove("disabled");
-    btn.textContent = "Toque para seguir ▶";
+    typed.textContent += "\n\n";
+    await sleep(400);
   }
+  btn.classList.remove("disabled");
+  btn.textContent = "Toque para seguir ▶";
+}
 
-  btn.addEventListener("mousedown",()=>fast=true);
-  btn.addEventListener("mouseup",()=>fast=false);
-  btn.addEventListener("touchstart",()=>fast=true,{passive:true});
-  btn.addEventListener("touchend",()=>fast=false,{passive:true});
+btn.addEventListener("mousedown",()=>fast=true);
+btn.addEventListener("mouseup",()=>fast=false);
+btn.addEventListener("touchstart",()=>fast=true,{passive:true});
+btn.addEventListener("touchend",()=>fast=false,{passive:true});
 
-  btn.addEventListener("click",()=>{
-    if(stage===0){
-      butterflies.classList.add("show");
-      btn.textContent="Agora… vamos lembrar ▶";
-      stage=1;
-      return;
-    }
-    if(stage===1){
-      start.classList.add("hide");
-      video.style.display="block";
-      video.play();
-      stage=2;
-    }
-  });
+btn.addEventListener("click",()=>{
+  if(stage===0){
+    butterflies.classList.add("show");
+    btn.textContent="Agora… vamos lembrar ▶";
+    stage=1;
+    return;
+  }
+  if(stage===1){
+    start.style.display="none";
+    video.style.display="block";
+    video.play();
+    stage=2;
+  }
+});
 
-  video.addEventListener("ended",()=>{
-    video.style.display="none";
-    end.classList.add("show");
-  });
+video.addEventListener("ended",()=>{
+  video.style.display="none";
+  end.classList.add("show");
+});
 
-  setTimeout(typeText,100);
+setTimeout(typeWriter,100);
 </script>
 
 </body>
