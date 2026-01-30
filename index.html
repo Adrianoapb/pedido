@@ -44,7 +44,7 @@ body{
 .title{ font-size:22px; margin:0 0 6px; }
 .subtitle{ font-size:15px; color:var(--muted); margin-bottom:10px; }
 
-/* ✍️ TEXTO COMPLETO COM ROLAGEM */
+/* TEXTO COMPLETO COM ROLAGEM */
 .typeBox{
   margin:10px 0 14px;
   padding:12px 14px;
@@ -54,25 +54,9 @@ body{
   font-size:14px;
   line-height:1.45;
   white-space:pre-wrap;
-
-  height: min(40vh, 240px); /* ⭐ limite da caixa */
+  height:min(40vh,240px);
   overflow-y:auto;
-  -webkit-overflow-scrolling: touch;
 }
-
-/* scrollbar discreta */
-.typeBox::-webkit-scrollbar{ width:6px; }
-.typeBox::-webkit-scrollbar-thumb{
-  background:rgba(255,255,255,.2);
-  border-radius:10px;
-}
-
-.caret{
-  display:inline-block;
-  width:10px;
-  animation:blink 1s steps(1) infinite;
-}
-@keyframes blink{50%{opacity:0;}}
 
 /* BORBOLETAS */
 .butterflies{
@@ -167,7 +151,8 @@ video{
   </div>
 </div>
 
-<video id="video">
+<!-- VÍDEO -->
+<video id="video" playsinline webkit-playsinline>
   <source src="./video.mp4" type="video/mp4">
 </video>
 
@@ -224,23 +209,35 @@ btn.addEventListener("mouseup",()=>fast=false);
 btn.addEventListener("touchstart",()=>fast=true,{passive:true});
 btn.addEventListener("touchend",()=>fast=false,{passive:true});
 
-btn.addEventListener("click",()=>{
-  if(stage===0){
+btn.addEventListener("click", async ()=>{
+  if(stage === 0){
     butterflies.classList.add("show");
-    btn.textContent="Agora… vamos lembrar ▶";
-    stage=1;
+    btn.textContent = "Agora… vamos lembrar ▶";
+    stage = 1;
     return;
   }
-  if(stage===1){
-    start.style.display="none";
-    video.style.display="block";
+
+  if(stage === 1){
+    start.style.display = "none";
+    video.style.display = "block";
+
+    /* ✅ FULLSCREEN GARANTIDO */
+    if(video.requestFullscreen){
+      await video.requestFullscreen();
+    }else if(video.webkitEnterFullscreen){
+      video.webkitEnterFullscreen(); // iOS
+    }
+
     video.play();
-    stage=2;
+    stage = 2;
   }
 });
 
 video.addEventListener("ended",()=>{
-  video.style.display="none";
+  if(document.fullscreenElement){
+    document.exitFullscreen().catch(()=>{});
+  }
+  video.style.display = "none";
   end.classList.add("show");
 });
 
